@@ -1,0 +1,1 @@
+Not a directory — must be ignored by getAllCategories().

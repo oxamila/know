@@ -1,0 +1,34 @@
+{
+  "name": "know",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Know — a categorized knowledge site with MDX content and first-class math rendering",
+  "license": "MIT",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "packageManager": "bun@1.3.14",
+  "engines": {
+    "node": ">=20.9.0"
+  },
+  "scripts": {
+    "dev": "turbo dev",
+    "build": "turbo build",
+    "lint": "turbo lint",
+    "typecheck": "turbo typecheck",
+    "test": "turbo test",
+    "test:e2e": "turbo test:e2e",
+    "check": "turbo lint typecheck test build",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "secrets:scan": "node scripts/scan-secrets.mjs"
+  },
+  "devDependencies": {
+    "@mdx-js/loader": "^3.1.1",
+    "prettier": "^3.6.2",
+    "prettier-plugin-tailwindcss": "^0.6.14",
+    "turbo": "^2.9.14",
+    "typescript": "^5.9.3"
+  }
+}

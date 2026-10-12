@@ -1,0 +1,88 @@
+---
+title: KaTeX Math Rendering Showcase
+description: Every way to write math on Know — inline, display, fenced blocks and more
+date: 2025-02-01
+author: Math Educator
+tags: [katex, latex, math, mdx]
+---
+
+import { MathGraph } from '@repo/math-viz'
+
+Know renders LaTeX at **build time** with [KaTeX](https://katex.org) — the formulas below are
+plain HTML in the server response, so they work without JavaScript and are crawlable by search
+engines.
+
+## Inline math
+
+Wrap expressions in single dollars: $E = mc^2$, the quadratic formula
+$x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}$, or Euler's identity $e^{i\pi} + 1 = 0$.
+
+Fractions, roots and scripts all work inline: $\frac{\partial f}{\partial x}$,
+$\sqrt[3]{27}$, $a_{i_j}^{n}$.
+
+## Display math
+
+Double dollars produce centered display equations:
+
+$$
+\int_{-\infty}^{\infty} e^{-x^2} \, dx = \sqrt{\pi}
+$$
+
+$$
+\begin{aligned}
+(a+b)^2 &= a^2 + 2ab + b^2 \\
+(a-b)^2 &= a^2 - 2ab + b^2
+\end{aligned}
+$$
+
+## Fenced code blocks
+
+````md
+```math
+\sum_{k=1}^{n} k = \frac{n(n+1)}{2}
+```
+````
+
+Which renders as:
+
+```math
+\sum_{k=1}^{n} k = \frac{n(n+1)}{2}
+```
+
+## Matrices and systems
+
+$$
+\begin{pmatrix}
+a & b \\
+c & d
+\end{pmatrix}
+\begin{pmatrix}
+x \\
+y
+\end{pmatrix}
+=
+\begin{pmatrix}
+e \\
+f
+\end{pmatrix}
+$$
+
+## Greek letters and operators
+
+$\alpha, \beta, \gamma, \Delta, \Sigma$, and operators such as
+$\nabla \times \mathbf{F}$, $\lim_{n \to \infty}$, $\prod_{i=1}^{n}$,
+$\binom{n}{k}$.
+
+## Interactive graph next to formulas
+
+Math coexists with the interactive components. The quadratic $y = x^2$ plotted interactively:
+
+<MathGraph
+  title="f(x) = x² − 2"
+  func={(x) => x * x - 2}
+  xMin={-3}
+  xMax={3}
+  color="#8b5cf6"
+  width={600}
+  height={400}
+/>

@@ -1,0 +1,46 @@
+{
+  "name": "@repo/mdx",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./plugins": {
+      "types": "./plugins.d.mts",
+      "default": "./plugins.mjs"
+    },
+    "./plugin-specs": "./plugin-specs.mjs",
+    "./components": "./src/components.tsx"
+  },
+  "scripts": {
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --coverage"
+  },
+  "dependencies": {
+    "katex": "^0.19.0",
+    "rehype-katex": "^7.0.1",
+    "remark-frontmatter": "^5.0.0",
+    "remark-gfm": "^4.0.1",
+    "remark-math": "^6.0.0"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0"
+  },
+  "devDependencies": {
+    "@mdx-js/mdx": "^3.1.1",
+    "@repo/eslint-config": "workspace:*",
+    "@repo/typescript-config": "workspace:*",
+    "@types/mdx": "^2.0.14",
+    "@types/node": "^24.0.0",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitest/coverage-v8": "^5.0.4",
+    "eslint": "^9.39.5",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "typescript": "^5.9.3",
+    "unified": "^11.0.5",
+    "vite": "^8.3.4",
+    "vitest": "^5.0.4"
+  }
+}
