@@ -1,6 +1,12 @@
 @import 'tailwindcss';
 @plugin '@tailwindcss/typography';
 
+/* Tailwind v4 auto-detection only scans apps/web — explicitly include the
+   workspace packages that ship class names (UI components, graphs, MDX styles). */
+@source '../../../packages/ui/src';
+@source '../../../packages/math-viz/src';
+@source '../../../packages/mdx/src';
+
 :root {
   --background: #ffffff;
   --foreground: #171717;

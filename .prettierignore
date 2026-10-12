@@ -9,3 +9,4 @@ _internal/
 bun.lock
 package-lock.json
 *.mdx
+next-env.d.ts
