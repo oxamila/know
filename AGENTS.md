@@ -54,6 +54,7 @@ Details: `docs/architecture.md`.
 - **MDX pipeline options must be serializable.** The remark/rehype config in `packages/mdx` crosses Turbopack's JS→Rust boundary, so express plugins as plain-object specs, not closures.
 - **Do not repeat the title as `# h1` in a post body.** The header already renders the frontmatter title as the single `h1`. Start bodies at `##`.
 - **Bun + isolated linking.** Root `node_modules` holds only root deps; each workspace has its own. A package must declare what it imports, including `@mdx-js/loader` where `@next/mdx` needs it.
+- **Tailwind v4 `@source`.** Auto-detection only scans `apps/web`. Utilities used only in `packages/*` (ui, math-viz, mdx) are invisible to the CSS unless listed via `@source` in `apps/web/app/globals.css`. If you add a new class in a package and it doesn't style, check there first.
 - **Content dates** may parse as `Date` objects; the schema normalizes them to `YYYY-MM-DD` strings. Do not assume `string` when reading raw YAML.
 
 ## Conventions
