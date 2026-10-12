@@ -90,6 +90,7 @@ Consequences worth knowing:
 
 - **TypeScript** — shared `tsconfig` bases in `packages/typescript-config`; strict mode everywhere.
 - **ESLint** — shared flat config in `packages/eslint-config`, extended per workspace.
-- **Prettier** — root config with the Tailwind plugin for class sorting.
+- **Prettier** — root config with the Tailwind plugin for class sorting. Note: the plugin may reorder utility class names, so tests assert single tokens rather than class pairs.
+- **Tailwind v4** — auto-detection only scans `apps/web`, so `apps/web/app/globals.css` lists `@source` paths for `packages/ui`, `packages/math-viz`, and `packages/mdx`. Add a `@source` entry when a new package ships class names.
 - **Turborepo** — task graph and remote/local caching (see `turbo.json`).
 - **Secret scanning** — `scripts/scan-secrets.mjs`, run as the `security` CI check, on top of GitHub's native secret scanning.
