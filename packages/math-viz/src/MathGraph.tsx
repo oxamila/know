@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react'
 
 interface FunctionDef {
-  func: (x: number) => number
+  func: (x: number, params: Record<string, number>) => number
   color?: string
   label?: string
   /** Shade the area between this curve and the x-axis (y = 0). */
@@ -12,9 +12,23 @@ interface FunctionDef {
   fillOpacity?: number
 }
 
+interface ParamDef {
+  /** Referenced in functions as `params[name]`. */
+  name: string
+  /** Slider caption; defaults to `name`. */
+  label?: string
+  min: number
+  max: number
+  /** Slider granularity; default 0.1. */
+  step?: number
+  default: number
+}
+
 interface MathGraphProps {
-  func?: (x: number) => number // Single function (backward compatible)
+  func?: (x: number, params: Record<string, number>) => number // Single function (backward compatible)
   functions?: FunctionDef[] // Multiple functions
+  /** Interactive sliders whose values are passed to every function as `params`. */
+  params?: ParamDef[]
   xMin?: number
   xMax?: number
   width?: number
@@ -29,6 +43,7 @@ interface MathGraphProps {
 export default function MathGraph({
   func,
   functions,
+  params,
   xMin: initialXMin = -5,
   xMax: initialXMax = 5,
   width = 500,
@@ -48,6 +63,23 @@ export default function MathGraph({
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 })
   const svgRef = useRef<SVGSVGElement>(null)
 
+  // Slider values (one entry per `params` definition)
+  const [paramValues, setParamValues] = useState<Record<string, number>>(() =>
+    Object.fromEntries((params ?? []).map((p) => [p.name, p.default])),
+  )
+
+  // Curves hidden via legend checkboxes (indices into functionsWithColors)
+  const [hidden, setHidden] = useState<Set<number>>(new Set())
+
+  const toggleVisible = (index: number) => {
+    setHidden((prev) => {
+      const next = new Set(prev)
+      if (next.has(index)) next.delete(index)
+      else next.add(index)
+      return next
+    })
+  }
+
   // Normalize to array of functions
   const defaultColors = ['#10b981', '#3b82f6', '#ec4899', '#f59e0b', '#8b5cf6', '#ef4444']
   const funcsToPlot: FunctionDef[] = functions || (func ? [{ func, color, label: 'f(x)' }] : [])
@@ -65,7 +97,7 @@ export default function MathGraph({
     for (let i = 0; i <= points; i++) {
       const x = xMin + (i / points) * (xMax - xMin)
       try {
-        const y = f(x)
+        const y = f(x, paramValues)
         if (isFinite(y)) {
           data.push({ x, y })
         }
@@ -76,17 +108,18 @@ export default function MathGraph({
     return data
   })
 
-  // Calculate bounds across all functions
+  // Calculate bounds across all functions (hidden curves still count so the
+  // scale does not jump when a checkbox is toggled)
   const allYValues = allData.flat().map((d) => d.y)
-  const maxY = Math.max(...allYValues)
-  const minY = Math.min(...allYValues)
+  const maxY = allYValues.length > 0 ? Math.max(...allYValues) : 1
+  const minY = allYValues.length > 0 ? Math.min(...allYValues) : -1
 
   const padding = 50
   const chartWidth = width - padding * 2
   const chartHeight = height - padding * 2
 
   const scaleX = (x: number) => ((x - xMin) / (xMax - xMin)) * chartWidth + padding
-  const scaleY = (y: number) => height - (((y - minY) / (maxY - minY)) * chartHeight + padding)
+  const scaleY = (y: number) => height - (((y - minY) / (maxY - minY || 1)) * chartHeight + padding)
 
   // Generate paths for all functions
   const linePaths = allData.map((data) =>
@@ -269,7 +302,7 @@ export default function MathGraph({
 
           {/* Shaded areas (under filled curves, behind their lines) */}
           {fillPaths.map((fillPath, i) =>
-            fillPath ? (
+            fillPath && !hidden.has(i) ? (
               <path
                 key={`fill-${i}`}
                 d={fillPath}
@@ -281,18 +314,20 @@ export default function MathGraph({
           )}
 
           {/* Function curves */}
-          {linePaths.map((linePath, i) => (
-            <path
-              key={i}
-              d={linePath}
-              fill="none"
-              stroke={functionsWithColors[i].color}
-              strokeWidth="3"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="drop-shadow-md"
-            />
-          ))}
+          {linePaths.map((linePath, i) =>
+            hidden.has(i) ? null : (
+              <path
+                key={i}
+                d={linePath}
+                fill="none"
+                stroke={functionsWithColors[i].color}
+                strokeWidth="3"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="drop-shadow-md"
+              />
+            ),
+          )}
 
           {/* Labels */}
           <g className="labels" fill="#374151" fontSize="12" fontFamily="monospace">
@@ -353,14 +388,53 @@ export default function MathGraph({
           </text>
         </svg>
 
-        {/* Legend */}
+        {/* Parameter sliders */}
+        {params && params.length > 0 && (
+          <div className="flex w-full max-w-lg flex-col gap-2 rounded-lg bg-white/80 px-4 py-3 shadow-md backdrop-blur-sm">
+            {params.map((p) => (
+              <label key={p.name} className="flex items-center gap-3 text-sm">
+                <span className="w-28 shrink-0 font-mono font-semibold text-gray-700">
+                  {p.label ?? p.name}
+                </span>
+                <input
+                  type="range"
+                  min={p.min}
+                  max={p.max}
+                  step={p.step ?? 0.1}
+                  value={paramValues[p.name] ?? p.default}
+                  onChange={(e) =>
+                    setParamValues((prev) => ({ ...prev, [p.name]: Number(e.target.value) }))
+                  }
+                  className="flex-1 accent-blue-600"
+                  aria-label={p.label ?? p.name}
+                />
+                <span className="w-14 shrink-0 text-right font-mono text-xs text-gray-600">
+                  {(paramValues[p.name] ?? p.default).toFixed(2)}
+                </span>
+              </label>
+            ))}
+          </div>
+        )}
+
+        {/* Legend (checkboxes toggle curve visibility when multiple functions) */}
         {showLegend && functionsWithColors.length > 1 && (
           <div className="flex flex-wrap items-center justify-center gap-3 rounded-lg bg-white/80 px-4 py-2 shadow-md backdrop-blur-sm">
             {functionsWithColors.map((f, i) => (
-              <div key={i} className="flex items-center gap-2">
-                <div className="h-1 w-6 rounded-full" style={{ backgroundColor: f.color }} />
+              <label key={i} className="flex cursor-pointer items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={!hidden.has(i)}
+                  onChange={() => toggleVisible(i)}
+                  className="h-4 w-4 accent-blue-600"
+                  aria-label={`Show ${f.label}`}
+                />
+                <span
+                  className="h-1 w-6 rounded-full"
+                  style={{ backgroundColor: f.color }}
+                  aria-hidden="true"
+                />
                 <span className="font-mono text-sm font-semibold text-gray-700">{f.label}</span>
-              </div>
+              </label>
             ))}
           </div>
         )}
@@ -381,7 +455,10 @@ export default function MathGraph({
         {/* Instructions */}
         <div className="max-w-md text-center text-xs text-gray-500">
           <p>
-            💡 <strong>Tip:</strong> Drag to pan • Scroll to zoom • Tap Reset to restore
+            💡 <strong>Tip:</strong> Drag to pan • Scroll to zoom
+            {params && params.length > 0 ? ' • Use sliders to change parameters' : ''}
+            {functionsWithColors.length > 1 ? ' • Untick legend items to hide curves' : ''} • Tap
+            Reset to restore
           </p>
         </div>
       </div>

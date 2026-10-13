@@ -6,6 +6,8 @@ import {
   MathGraph3DDemo,
   MathGraphDemo,
   MultiFunctionDemo,
+  ParamsDemo,
+  TogglesDemo,
 } from '@/app/docs/examples'
 import { siteName } from '@/lib/site'
 
@@ -217,8 +219,9 @@ Prose, then $f(x) = \\sin(x)$ inline math and a live graph:
             (an array) instead of{' '}
             <code className="rounded bg-gray-100 px-1 font-mono text-sm text-pink-600">func</code>{' '}
             to draw several curves on one graph. Colors are assigned automatically from a palette if
-            you omit them, and a legend appears whenever there is more than one curve. Omitted
-            labels become{' '}
+            you omit them, and a legend appears whenever there is more than one curve — each legend
+            entry is a checkbox, so readers can untick a curve to hide it and tick it again to bring
+            it back. Omitted labels become{' '}
             <code className="rounded bg-gray-100 px-1 font-mono text-sm text-pink-600">f1(x)</code>,{' '}
             <code className="rounded bg-gray-100 px-1 font-mono text-sm text-pink-600">f2(x)</code>,
             …
@@ -263,20 +266,56 @@ Prose, then $f(x) = \\sin(x)$ inline math and a live graph:
   xMax={Math.PI}
 />`}</Code>
 
+          <H3>Parameter sliders</H3>
+          <p className="mb-4 text-lg leading-relaxed text-gray-700">
+            Pass{' '}
+            <code className="rounded bg-gray-100 px-1 font-mono text-sm text-pink-600">params</code>{' '}
+            (an array of{' '}
+            <code className="rounded bg-gray-100 px-1 font-mono text-sm text-pink-600">
+              &#123; name, label?, min, max, step?, default &#125;
+            </code>
+            ) and every plotted function is called with{' '}
+            <code className="rounded bg-gray-100 px-1 font-mono text-sm text-pink-600">(x, p)</code>{' '}
+            — where{' '}
+            <code className="rounded bg-gray-100 px-1 font-mono text-sm text-pink-600">p</code> maps
+            each param name to its current slider value. Sliders render below the plot; the curve
+            redraws live as the reader drags. Great for letting readers explore a family of
+            functions without writing any extra state code.
+          </p>
+
+          <ParamsDemo />
+
+          <Code>{`<MathGraph
+  title="y = a · sin(b · x)"
+  functions={[{ func: (x, p) => p.a * Math.sin(p.b * x), label: 'a · sin(b · x)' }]}
+  params={[
+    { name: 'a', label: 'amplitude a', min: 0.5, max: 3, step: 0.1, default: 1 },
+    { name: 'b', label: 'frequency b', min: 0.5, max: 4, step: 0.1, default: 1 },
+  ]}
+  xMin={-Math.PI * 2}
+  xMax={Math.PI * 2}
+/>`}</Code>
+
           <H3>Props</H3>
           <PropTable
             rows={[
               [
                 'func',
-                '(x: number) => number',
+                '(x: number, p: Record<string, number>) => number',
                 '—',
-                'Single function to plot (mutually used when `functions` is absent)',
+                'Single function to plot (mutually used when `functions` is absent); p carries the current slider values when params is set',
               ],
               [
                 'functions',
                 'FunctionDef[]',
                 '—',
                 'Multiple functions: `{ func, color?, label?, fill?, fillOpacity? }[]` — plot on one shared graph for comparison',
+              ],
+              [
+                'params',
+                'ParamDef[]',
+                '—',
+                'Interactive sliders: `{ name, label?, min, max, step?, default }[]` — every function is called as (x, p) with p[name] = slider value',
               ],
               ['xMin', 'number', '-5', 'Left edge of the visible x range'],
               ['xMax', 'number', '5', 'Right edge of the visible x range'],
@@ -300,7 +339,7 @@ Prose, then $f(x) = \\sin(x)$ inline math and a live graph:
                 'showLegend',
                 'boolean',
                 'true',
-                'Show the legend; it only appears when plotting more than one function',
+                'Show the legend; it only appears when plotting more than one function. Legend entries are checkboxes that hide/show curves',
               ],
               [
                 'fill',
@@ -454,6 +493,28 @@ Prose, then $f(x) = \\sin(x)$ inline math and a live graph:
   ]}
 />`}</Code>
 
+          <H3>Hiding and showing series (toggles)</H3>
+          <p className="mb-4 text-lg leading-relaxed text-gray-700">
+            Add{' '}
+            <code className="rounded bg-gray-100 px-1 font-mono text-sm text-pink-600">
+              toggles
+            </code>{' '}
+            and the legend entries become checkboxes: untick a labelled series to hide it, tick it
+            back to restore it. Hidden bar series drop out of the side-by-side grouping, so the
+            remaining bars re-space automatically.
+          </p>
+
+          <TogglesDemo />
+
+          <Code>{`<Chart
+  title="Untick legend items to hide series"
+  toggles
+  datasets={[
+    { data: revenue, type: 'bar',  color: '#3b82f6', label: 'Revenue' },
+    { data: trend,   type: 'line', color: '#ec4899', label: 'Trend' },
+  ]}
+/>`}</Code>
+
           <H3>Props</H3>
           <PropTable
             rows={[
@@ -474,6 +535,12 @@ Prose, then $f(x) = \\sin(x)$ inline math and a live graph:
                 "'line' | 'bar'",
                 "'line'",
                 'Single-series style; the per-dataset `type` additionally supports area',
+              ],
+              [
+                'toggles',
+                'boolean',
+                'false',
+                'Render legend entries as checkboxes so readers can hide/show labelled series',
               ],
               ['width', 'number', '400', 'SVG width in pixels'],
               ['height', 'number', '300', 'SVG height in pixels'],

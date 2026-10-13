@@ -57,20 +57,36 @@ import { MathGraph } from '@repo/math-viz'
 />
 ```
 
-To compare several functions on one shared graph, pass `functions` (an array of `{ func, color?, label?, fill?, fillOpacity? }`) instead of `func`; colors and a legend are handled automatically. Set `fill: true` on an entry to shade the area between that curve and the x-axis (`fillOpacity` controls transparency, default 0.2).
+To compare several functions on one shared graph, pass `functions` (an array of `{ func, color?, label?, fill?, fillOpacity? }`) instead of `func`; colors and a legend are handled automatically. Set `fill: true` on an entry to shade the area between that curve and the x-axis (`fillOpacity` controls transparency, default 0.2). Legend entries are checkboxes, so readers can untick a curve to hide it and tick it back to restore it.
 
-| Prop            | Required | Default    | Notes                                                |
-| --------------- | -------- | ---------- | ---------------------------------------------------- |
-| `title`         | no       | —          | Caption above the plot                               |
-| `func`          | no       | —          | `(x: number) => number`; single-function form        |
-| `functions`     | no       | —          | `FunctionDef[]` multi-curve form (see above)         |
-| `xMin` / `xMax` | no       | `-5` / `5` | Visible x range                                      |
-| `width`         | no       | `500`      | SVG width in px                                      |
-| `height`        | no       | `400`      | SVG height in px                                     |
-| `color`         | no       | `#10b981`  | Curve color (single-function form)                   |
-| `showGrid`      | no       | `true`     | Dashed background grid                               |
-| `points`        | no       | `200`      | Samples per curve                                    |
-| `showLegend`    | no       | `true`     | Legend; only shown when plotting more than one curve |
+To let readers explore a family of functions interactively, pass `params` (an array of `{ name, label?, min, max, step?, default }`). Every plotted function is then called as `(x, p)` where `p[name]` is the current slider value; labeled sliders render below the plot and the curve redraws live:
+
+```mdx
+<MathGraph
+  title="y = a · sin(b · x)"
+  functions={[{ func: (x, p) => p.a * Math.sin(p.b * x), label: 'a · sin(b · x)' }]}
+  params={[
+    { name: 'a', label: 'amplitude a', min: 0.5, max: 3, step: 0.1, default: 1 },
+    { name: 'b', label: 'frequency b', min: 0.5, max: 4, step: 0.1, default: 1 },
+  ]}
+  xMin={-Math.PI * 2}
+  xMax={Math.PI * 2}
+/>
+```
+
+| Prop            | Required | Default    | Notes                                                                                              |
+| --------------- | -------- | ---------- | -------------------------------------------------------------------------------------------------- |
+| `title`         | no       | —          | Caption above the plot                                                                             |
+| `func`          | no       | —          | `(x: number, p: Record<string, number>) => number`; single-function form (p carries slider values) |
+| `functions`     | no       | —          | `FunctionDef[]` multi-curve form (see above)                                                       |
+| `params`        | no       | —          | `ParamDef[]` sliders; every function is called as `(x, p)`                                         |
+| `xMin` / `xMax` | no       | `-5` / `5` | Visible x range                                                                                    |
+| `width`         | no       | `500`      | SVG width in px                                                                                    |
+| `height`        | no       | `400`      | SVG height in px                                                                                   |
+| `color`         | no       | `#10b981`  | Curve color (single-function form)                                                                 |
+| `showGrid`      | no       | `true`     | Dashed background grid                                                                             |
+| `points`        | no       | `200`      | Samples per curve                                                                                  |
+| `showLegend`    | no       | `true`     | Legend (checkboxes to hide/show curves); only shown when plotting more than one curve              |
 
 The y-axis auto-fits the sampled values; there is no `yMin`/`yMax` prop, so narrow the x range around functions with vertical asymptotes. Drag to pan, scroll to zoom.
 
@@ -98,7 +114,7 @@ import { MathGraph3D } from '@repo/math-viz'
 
 ### `Chart` (line/bar/area)
 
-`Chart` plots explicit `{ x, y }` data points (not a function). The simple form takes `data` plus `type` (`'line' | 'bar'`, default `'line'`). To mix series on one chart, pass `datasets` (an array of `{ data, type?, color?, label? }`) instead — each series can be `'line'`, `'bar'`, or `'area'` (a line with the region beneath it shaded to the baseline); multiple bar series are placed side by side, and a legend appears when datasets have labels. Other props: `width` (400), `height` (300), `color`, `title`. Use it for tabular data; use `MathGraph` for mathematical functions.
+`Chart` plots explicit `{ x, y }` data points (not a function). The simple form takes `data` plus `type` (`'line' | 'bar'`, default `'line'`). To mix series on one chart, pass `datasets` (an array of `{ data, type?, color?, label? }`) instead — each series can be `'line'`, `'bar'`, or `'area'` (a line with the region beneath it shaded to the baseline); multiple bar series are placed side by side, and a legend appears when datasets have labels. Set `toggles: true` to turn the legend into checkboxes so readers can hide/show labelled series (hidden bar series drop out of the grouping, so remaining bars re-space). Other props: `width` (400), `height` (300), `color`, `title`. Use it for tabular data; use `MathGraph` for mathematical functions.
 
 The full reference with live examples is served by the site itself at the **Docs** page (`/docs`, linked in the site header). It documents every prop of all three components, the MDX element map, math syntax, and frontmatter — and a machine-readable index is served at `/llms.txt` for LLM tools.
 

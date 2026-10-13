@@ -18,6 +18,8 @@ interface ChartProps {
   data?: DataPoint[] // Single-series form (backward compatible)
   type?: 'line' | 'bar' // Single-series style (backward compatible)
   datasets?: DatasetDef[] // Multiple series, mixable line/bar/area
+  /** Render the legend as checkboxes so readers can hide/show series. */
+  toggles?: boolean
   width?: number
   height?: number
   color?: string
@@ -37,12 +39,25 @@ export default function Chart({
   ],
   type = 'line',
   datasets,
+  toggles = false,
   width = 400,
   height = 300,
   color = DEFAULT_SERIES_COLOR,
   title,
 }: ChartProps) {
   const [mounted, setMounted] = useState(false)
+
+  // Series hidden via legend checkboxes (indices into seriesWithStyles)
+  const [hidden, setHidden] = useState<Set<number>>(new Set())
+
+  const toggleVisible = (index: number) => {
+    setHidden((prev) => {
+      const next = new Set(prev)
+      if (next.has(index)) next.delete(index)
+      else next.add(index)
+      return next
+    })
+  }
 
   useEffect(() => {
     setMounted(true)
@@ -58,6 +73,11 @@ export default function Chart({
     label: s.label,
   }))
 
+  // Hidden series keep contributing to the bounds (stable scale while toggling)
+  // but are excluded from drawing and bar grouping.
+  const visibleSeries = seriesWithStyles.filter((_, i) => !hidden.has(i))
+  const visiblePoints = visibleSeries.flatMap((s) => s.data)
+
   const allPoints = seriesWithStyles.flatMap((s) => s.data)
   const maxX = allPoints.length > 0 ? Math.max(...allPoints.map((d) => d.x)) : 1
   const maxY = allPoints.length > 0 ? Math.max(...allPoints.map((d) => d.y)) : 1
@@ -69,8 +89,7 @@ export default function Chart({
   const chartHeight = height - padding * 2
 
   const scaleX = (x: number) => ((x - minX) / (maxX - minX || 1)) * chartWidth + padding
-  const scaleY = (y: number) =>
-    height - (((y - minY) / (maxY - minY || 1)) * chartHeight + padding)
+  const scaleY = (y: number) => height - (((y - minY) / (maxY - minY || 1)) * chartHeight + padding)
 
   // Baseline for bars and area fills: y = 0 when visible, else the chart floor
   const baselineY = Math.min(Math.max(scaleY(0), padding), height - padding)
@@ -89,8 +108,9 @@ export default function Chart({
   }
 
   // Group bar series so they can be drawn side by side per x position
-  const barSeries = seriesWithStyles.filter((s) => s.type === 'bar')
-  const distinctXCount = Math.max(new Set(allPoints.map((d) => d.x)).size, 1)
+  // (from visible series only, so hiding a bar series re-groups the rest)
+  const barSeries = visibleSeries.filter((s) => s.type === 'bar')
+  const distinctXCount = Math.max(new Set(visiblePoints.map((d) => d.x)).size, 1)
   const barWidth = (chartWidth / distinctXCount) * 0.6
 
   const showLegend = seriesWithStyles.length > 1 && seriesWithStyles.some((s) => s.label)
@@ -133,7 +153,7 @@ export default function Chart({
           </g>
 
           {/* Area fills (behind lines and bars) */}
-          {seriesWithStyles.map((s, i) =>
+          {visibleSeries.map((s, i) =>
             s.type === 'area' ? (
               <path
                 key={`area-${i}`}
@@ -146,7 +166,7 @@ export default function Chart({
           )}
 
           {/* Bars (grouped side by side when several bar series share x values) */}
-          {seriesWithStyles.map((s, si) => {
+          {visibleSeries.map((s, si) => {
             if (s.type !== 'bar') return null
             const barIndex = barSeries.indexOf(s)
             const slotWidth = barWidth / Math.max(barSeries.length, 1)
@@ -168,7 +188,7 @@ export default function Chart({
           })}
 
           {/* Lines and points */}
-          {seriesWithStyles.map((s, i) =>
+          {visibleSeries.map((s, i) =>
             s.type === 'line' || s.type === 'area' ? (
               <g key={`line-${i}`}>
                 <path
@@ -214,15 +234,33 @@ export default function Chart({
           </g>
         </svg>
 
-        {/* Legend */}
+        {/* Legend (checkboxes when toggles is on) */}
         {showLegend && (
           <div className="flex flex-wrap items-center justify-center gap-3 rounded-lg bg-white/80 px-4 py-2 shadow-md backdrop-blur-sm">
             {seriesWithStyles.map((s, i) =>
               s.label ? (
-                <div key={i} className="flex items-center gap-2">
-                  <div className="h-1 w-6 rounded-full" style={{ backgroundColor: s.color }} />
-                  <span className="font-mono text-sm font-semibold text-gray-700">{s.label}</span>
-                </div>
+                toggles ? (
+                  <label key={i} className="flex cursor-pointer items-center gap-2">
+                    <input
+                      type="checkbox"
+                      checked={!hidden.has(i)}
+                      onChange={() => toggleVisible(i)}
+                      className="h-4 w-4 accent-blue-600"
+                      aria-label={`Show ${s.label}`}
+                    />
+                    <div
+                      className="h-1 w-6 rounded-full"
+                      style={{ backgroundColor: s.color }}
+                      aria-hidden="true"
+                    />
+                    <span className="font-mono text-sm font-semibold text-gray-700">{s.label}</span>
+                  </label>
+                ) : (
+                  <div key={i} className="flex items-center gap-2">
+                    <div className="h-1 w-6 rounded-full" style={{ backgroundColor: s.color }} />
+                    <span className="font-mono text-sm font-semibold text-gray-700">{s.label}</span>
+                  </div>
+                )
               ) : null,
             )}
           </div>
