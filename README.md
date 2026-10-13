@@ -8,6 +8,7 @@ Every post lives in `apps/web/content/<category>/<slug>.mdx`, is validated again
 - **Content**: MDX with YAML frontmatter
 - **Math**: KaTeX via `remark-math` + `rehype-katex` (SSR, no client JS required)
 - **Interactive graphs**: `MathGraph` / `MathGraph3D` client components
+- **UI**: shadcn/ui components (vendored into `apps/web/components/ui`) on Tailwind v4 tokens
 - **Tooling**: Bun workspaces, Turborepo, TypeScript, ESLint, Prettier
 - **Quality**: Vitest (unit) + Playwright (E2E), GitHub Actions CI
 
@@ -42,6 +43,7 @@ All commands run from the repo root and fan out through Turborepo.
 ```
 apps/
   web/               Next.js site: pages, content, unit + E2E tests
+  web/components/ui/ Vendored shadcn/ui primitives (button, card, table, …)
 packages/
   content/           Zod schema + repository for frontmatter and post bodies
   mdx/               MDX pipeline (remark/rehype plugin specs)

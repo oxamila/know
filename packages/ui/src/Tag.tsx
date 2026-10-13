@@ -1,6 +1,6 @@
 export function Tag({ label }: { label: string }) {
   return (
-    <span className="rounded-full bg-gradient-to-r from-blue-500 to-purple-500 px-2.5 py-1 text-xs font-semibold text-white">
+    <span className="bg-primary text-primary-foreground inline-flex h-5 w-fit shrink-0 items-center overflow-hidden rounded-full px-2.5 py-0.5 text-xs font-medium">
       #{label}
     </span>
   )

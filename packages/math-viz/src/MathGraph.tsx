@@ -263,7 +263,7 @@ export default function MathGraph({
           ref={svgRef}
           width={width}
           height={height}
-          className="cursor-grab select-none rounded-xl border-2 border-gray-200 bg-gradient-to-br from-gray-50 to-white shadow-lg active:cursor-grabbing"
+          className="cursor-grab rounded-xl border-2 border-gray-200 bg-gradient-to-br from-gray-50 to-white shadow-lg select-none active:cursor-grabbing"
           onMouseDown={handleMouseDown}
           onMouseMove={handleMouseMove}
           onMouseUp={handleMouseUp}

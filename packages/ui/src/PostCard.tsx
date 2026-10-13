@@ -15,16 +15,16 @@ export interface PostCardData {
 export function PostCard({ post }: { post: PostCardData }) {
   return (
     <Link href={`/posts/${post.category}/${post.slug}`} aria-label={post.title} className="group">
-      <article className="h-full rounded-xl border-2 border-transparent bg-white/80 p-6 shadow-lg backdrop-blur-sm transition-all duration-300 hover:shadow-2xl group-hover:border-blue-500">
-        <h3 className="mb-3 text-2xl font-bold text-gray-800 transition-colors group-hover:text-blue-600">
+      <article className="bg-card text-card-foreground ring-foreground/10 hover:ring-primary/60 flex h-full flex-col rounded-xl py-6 ring-1 transition-all duration-300 hover:shadow-lg">
+        <h3 className="group-hover:text-primary mb-3 px-6 text-2xl font-bold transition-colors">
           {post.title}
         </h3>
-        <p className="mb-4 line-clamp-3 text-gray-600">{post.description}</p>
-        <div className="mb-4 flex items-center gap-4 text-sm text-gray-500">
+        <p className="text-muted-foreground mb-4 line-clamp-3 px-6">{post.description}</p>
+        <div className="text-muted-foreground mb-4 flex items-center gap-4 px-6 text-sm">
           <time dateTime={post.date}>{formatDateShort(post.date)}</time>
           <span>{post.author}</span>
         </div>
-        <div className="flex flex-wrap gap-2">
+        <div className="mt-auto flex flex-wrap gap-2 px-6">
           {post.tags.map((tag) => (
             <Tag key={tag} label={tag} />
           ))}
