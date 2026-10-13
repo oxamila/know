@@ -50,6 +50,7 @@ apps/web/
     home.spec.ts           home page, cards, navigation
     post.spec.ts           post rendering, metadata, interactive graphs
     math.spec.ts           KaTeX output in the served HTML
+    docs.spec.ts           /docs reference page, live demos, /llms.txt
     navigation-seo.spec.ts 404 handling, canonical URLs, meta tags
   playwright.config.ts
 ```
@@ -89,4 +90,4 @@ cd apps/web && bunx playwright test e2e/post.spec.ts
 ## Adding tests
 
 - New logic → a unit test next to it, and bump coverage if the new code path is untested.
-- New user-facing behavior → an E2E spec in the file that matches the surface (`home`, `post`, `math`, `navigation-seo`).
+- New user-facing behavior → an E2E spec in the file that matches the surface (`home`, `post`, `math`, `docs`, `navigation-seo`).

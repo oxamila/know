@@ -51,7 +51,11 @@ Imports come after the frontmatter and before the body content.
 
 ### Math
 
-Wrap math in `$…$` for inline and `$$…$$` for display. It compiles to KaTeX at build time and renders in the server HTML — no client JavaScript needed. See [`docs/math.md`](docs/math.md).
+Wrap math in `$…$` for inline and `$$…$$` for display. It compiles to KaTeX at build time and renders in the server HTML — no client JavaScript needed. See [`docs/math.md`](math.md).
+
+### The site's own reference
+
+The deployed site serves a full component and authoring reference at `/docs` (live demos of every graph component, the complete MDX element map, math syntax, frontmatter schema) and a machine-readable summary at `/llms.txt`. When you add or change component props, update that page (`apps/web/app/docs/page.tsx`) along with this guide.
 
 ## Interactive graphs
 

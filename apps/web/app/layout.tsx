@@ -52,6 +52,9 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
               <Link href="/" className="hover:text-blue-600">
                 Home
               </Link>
+              <Link href="/docs" className="hover:text-blue-600">
+                Docs
+              </Link>
               <Link href="/sitemap.xml" className="hover:text-blue-600">
                 Sitemap
               </Link>

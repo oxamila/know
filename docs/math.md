@@ -51,25 +51,28 @@ import { MathGraph } from '@repo/math-viz'
   func={(x) => Math.sin(x)}
   xMin={-2 * Math.PI}
   xMax={2 * Math.PI}
-  yMin={-1.5}
-  yMax={1.5}
   color="#10b981"
   width={600}
   height={400}
 />
 ```
 
-| Prop     | Required | Default   | Notes                              |
-| -------- | -------- | --------- | ---------------------------------- |
-| `title`  | no       | —         | Caption above the plot             |
-| `func`   | yes      | —         | `(x: number) => number`            |
-| `xMin`   | no       | `-10`     | Left bound                         |
-| `xMax`   | no       | `10`      | Right bound                        |
-| `yMin`   | no       | auto      | Lower bound (auto-fits if omitted) |
-| `yMax`   | no       | auto      | Upper bound (auto-fits if omitted) |
-| `color`  | no       | `#3b82f6` | Curve color                        |
-| `width`  | no       | `600`     | Canvas width in px                 |
-| `height` | no       | `400`     | Canvas height in px                |
+To compare several functions on one shared graph, pass `functions` (an array of `{ func, color?, label? }`) instead of `func`; colors and a legend are handled automatically.
+
+| Prop            | Required | Default    | Notes                                                |
+| --------------- | -------- | ---------- | ---------------------------------------------------- |
+| `title`         | no       | —          | Caption above the plot                               |
+| `func`          | no       | —          | `(x: number) => number`; single-function form        |
+| `functions`     | no       | —          | `FunctionDef[]` multi-curve form (see above)         |
+| `xMin` / `xMax` | no       | `-5` / `5` | Visible x range                                      |
+| `width`         | no       | `500`      | SVG width in px                                      |
+| `height`        | no       | `400`      | SVG height in px                                     |
+| `color`         | no       | `#10b981`  | Curve color (single-function form)                   |
+| `showGrid`      | no       | `true`     | Dashed background grid                               |
+| `points`        | no       | `200`      | Samples per curve                                    |
+| `showLegend`    | no       | `true`     | Legend; only shown when plotting more than one curve |
+
+The y-axis auto-fits the sampled values; there is no `yMin`/`yMax` prop, so narrow the x range around functions with vertical asymptotes. Drag to pan, scroll to zoom.
 
 ### `MathGraph3D` (3D)
 
@@ -91,7 +94,13 @@ import { MathGraph3D } from '@repo/math-viz'
 />
 ```
 
-`surfaces` is an array of `{ func, color }`, where `func` is `(x, y) => number`. Plot several surfaces in one viewer by adding more entries. Controls let you rotate, pan, and zoom, plus dedicated axis-view buttons.
+`surfaces` is an array of `{ func, color, label? }`, where `func` is `(x, y) => number`. Plot several surfaces in one viewer by adding more entries; a legend appears automatically. Props: `xMin`/`xMax`/`yMin`/`yMax` (all default `-5`/`5`), `width` (600), `height` (500), `color`, `title`, `showGrid`, `gridSize` (20, mesh resolution), `showAxes`, `showLegend`. Controls let you orbit (with momentum), pan, and zoom, plus Home/Auto/Grid toggles and X/Y/Z axis-view buttons.
+
+### `Chart` (line/bar)
+
+`Chart` plots explicit `{ x, y }` data points (not a function) as a static line or bar chart. Props: `data`, `type` (`'line' | 'bar'`, default `'line'`), `width` (400), `height` (300), `color`, `title`. Use it for tabular data; use `MathGraph` for mathematical functions.
+
+The full reference with live examples is served by the site itself at the **Docs** page (`/docs`, linked in the site header). It documents every prop of all three components, the MDX element map, math syntax, and frontmatter — and a machine-readable index is served at `/llms.txt` for LLM tools.
 
 ## Why function props work in MDX
 
