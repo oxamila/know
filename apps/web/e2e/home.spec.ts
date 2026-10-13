@@ -30,10 +30,8 @@ test.describe('home page', () => {
 
   test('navigates from a card to the post page', async ({ page }) => {
     await page.goto('/')
-    await page.getByRole('link', { name: /Introduction to Calculus/ }).click()
+    await page.getByRole('link', { name: /Calculus from Zero/ }).click()
     await expect(page).toHaveURL(/\/posts\/posts\/intro-to-calculus/)
-    await expect(
-      page.getByRole('heading', { level: 1, name: 'Introduction to Calculus' }),
-    ).toBeVisible()
+    await expect(page.getByRole('heading', { level: 1, name: /Calculus from Zero/ })).toBeVisible()
   })
 })

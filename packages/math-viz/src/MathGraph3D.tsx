@@ -450,11 +450,18 @@ export default function MathGraph3D({
     setIsPanning(false)
   }
 
-  // Zoom with mouse wheel (smoother)
+  // Zoom with mouse wheel — only with Ctrl/⌘ held (trackpad pinch reports as
+  // ctrlKey). Plain scroll passes through so the page keeps scrolling when the
+  // cursor happens to sit over the viewer.
   const handleWheel = (e: React.WheelEvent) => {
+    if (!e.ctrlKey && !e.metaKey) return
     e.preventDefault()
     const zoomFactor = e.deltaY > 0 ? 0.95 : 1.05
     setZoom(Math.max(0.3, Math.min(4, zoom * zoomFactor)))
+  }
+
+  const zoomBy = (factor: number) => {
+    setZoom(Math.max(0.3, Math.min(4, zoom * factor)))
   }
 
   // Auto-rotate toggle
@@ -644,6 +651,22 @@ export default function MathGraph3D({
               className="rounded-lg bg-gradient-to-r from-blue-500 to-purple-500 px-4 py-2 text-sm font-semibold text-white shadow-md transition-all hover:scale-105 hover:shadow-lg active:scale-95"
             >
               🏠 Home
+            </button>
+
+            <button
+              onClick={() => zoomBy(1.15)}
+              aria-label="Zoom out"
+              className="rounded-lg bg-gray-400 px-3 py-2 text-sm font-semibold text-white shadow-md transition-all hover:scale-105 hover:bg-gray-500 active:scale-95"
+            >
+              −
+            </button>
+
+            <button
+              onClick={() => zoomBy(0.87)}
+              aria-label="Zoom in"
+              className="rounded-lg bg-gray-400 px-3 py-2 text-sm font-semibold text-white shadow-md transition-all hover:scale-105 hover:bg-gray-500 active:scale-95"
+            >
+              +
             </button>
 
             <button
