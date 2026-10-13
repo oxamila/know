@@ -7,7 +7,7 @@ Know is a Turborepo monorepo. Each workspace is a small, focused package; the Ne
 Turborepo runs tasks (`build`, `lint`, `typecheck`, `test`, `test:e2e`) across all workspaces with caching and correct topological ordering (`dependsOn: ["^build"]`). Workspaces are declared in the root `package.json` (`apps/*`, `packages/*`) and installed with Bun.
 
 ```
-apps/web                the Next.js site (the only deployable)
+apps/web                the Next.js site (the only deployable) + shadcn/ui components
 packages/content        frontmatter schema + repository
 packages/mdx            remark/rehype pipeline
 packages/math-viz       interactive graph components
@@ -50,6 +50,12 @@ Server-safe presentational components shared between pages: `PostCard`, `PostHea
 
 The Next.js App Router site. It owns pages, routing, metadata, the content directory, and both test suites. It depends on every package above.
 
+### `apps/web/components/ui` — shadcn/ui
+
+The app vendors a small set of **shadcn/ui** primitives into `apps/web/components/ui` (`button`, `badge`, `card`, `table`, `separator`, `skeleton`, …). These are not imported from a package — they are copied into the repo, themed through the Tailwind v4 tokens in `app/globals.css` (`--primary`, `--background`, `--card`, …), and built on Radix primitives plus `class-variance-authority` for variants. The `cn()` class-merge helper lives in `apps/web/lib/utils`.
+
+Because they are copied rather than imported, there is no library upgrade path to chase — you edit them in place. `packages/ui` components (`PostCard`, `PostHeader`, `Tag`) are styled with the same tokens so the two layers stay visually consistent.
+
 ## Data flow
 
 ```
@@ -91,6 +97,7 @@ Consequences worth knowing:
 - **TypeScript** — shared `tsconfig` bases in `packages/typescript-config`; strict mode everywhere.
 - **ESLint** — shared flat config in `packages/eslint-config`, extended per workspace.
 - **Prettier** — root config with the Tailwind plugin for class sorting. Note: the plugin may reorder utility class names, so tests assert single tokens rather than class pairs.
-- **Tailwind v4** — auto-detection only scans `apps/web`, so `apps/web/app/globals.css` lists `@source` paths for `packages/ui`, `packages/math-viz`, and `packages/mdx`. Add a `@source` entry when a new package ships class names.
+- **Tailwind v4** — auto-detection only scans `apps/web`, so `apps/web/app/globals.css` lists `@source` paths for `packages/ui`, `packages/math-viz`, and `packages/mdx`. Add a `@source` entry when a new package ships class names. The same file defines the shadcn/ui design tokens (light and dark) that both `apps/web/components/ui` and `packages/ui` consume.
+- **shadcn/ui** — components are generated into `apps/web/components/ui` (configured by `apps/web/components.json`) and themed via CSS variables; see the workspace section above.
 - **Turborepo** — task graph and remote/local caching (see `turbo.json`).
 - **Secret scanning** — `scripts/scan-secrets.mjs`, run as the `security` CI check, on top of GitHub's native secret scanning.

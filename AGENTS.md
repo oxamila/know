@@ -56,6 +56,7 @@ Details: `docs/architecture.md`.
 - **Bun + isolated linking.** Root `node_modules` holds only root deps; each workspace has its own. A package must declare what it imports, including `@mdx-js/loader` where `@next/mdx` needs it.
 - **Tailwind v4 `@source`.** Auto-detection only scans `apps/web`. Utilities used only in `packages/*` (ui, math-viz, mdx) are invisible to the CSS unless listed via `@source` in `apps/web/app/globals.css`. If you add a new class in a package and it doesn't style, check there first.
 - **Content dates** may parse as `Date` objects; the schema normalizes them to `YYYY-MM-DD` strings. Do not assume `string` when reading raw YAML.
+- **shadcn/ui components are vendored in the app.** `apps/web/components/ui/*` (button, card, table, …) are copied sources, themed via the Tailwind tokens in `apps/web/app/globals.css` (`--primary`, `--card`, …); use `cn()` from `apps/web/lib/utils`. `packages/ui` is styled with the same tokens — keep both in sync visually. Extend via `bunx shadcn@latest add …` from `apps/web`, not by editing registry copies blindly.
 
 ## Conventions
 

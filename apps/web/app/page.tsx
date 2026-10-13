@@ -14,12 +14,12 @@ export default function HomePage() {
           <h1 className="mb-4 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-6xl font-extrabold text-transparent">
             Know
           </h1>
-          <p className="text-xl text-gray-600">Explore knowledge organized by category</p>
+          <p className="text-muted-foreground text-xl">Explore knowledge organized by category</p>
         </header>
 
         {groups.map(([category, categoryPosts]) => (
           <section key={category} className="mb-12">
-            <h2 className="mb-6 inline-block border-b-4 border-blue-500 pb-3 text-3xl font-bold capitalize text-gray-800">
+            <h2 className="text-foreground mb-6 inline-block border-b-4 border-blue-500 pb-3 text-3xl font-bold capitalize">
               {category}
             </h2>
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -31,7 +31,7 @@ export default function HomePage() {
         ))}
 
         {posts.length === 0 && (
-          <div className="py-12 text-center text-gray-500">
+          <div className="text-muted-foreground py-12 text-center">
             <p className="text-xl">No posts yet. Start creating content!</p>
           </div>
         )}

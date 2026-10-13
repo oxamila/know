@@ -8,23 +8,23 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
   return {
     // Headings
     h1: ({ children }) => (
-      <h1 className="mb-8 mt-12 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-5xl font-extrabold leading-tight text-transparent">
+      <h1 className="mt-12 mb-8 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-5xl leading-tight font-extrabold text-transparent">
         {children}
       </h1>
     ),
     h2: ({ children }) => (
-      <h2 className="mb-6 mt-10 border-b-4 border-blue-500 pb-3 text-4xl font-bold text-gray-800">
+      <h2 className="mt-10 mb-6 border-b-4 border-blue-500 pb-3 text-4xl font-bold text-gray-800">
         {children}
       </h2>
     ),
     h3: ({ children }) => (
-      <h3 className="mb-4 mt-8 flex items-center gap-2 text-3xl font-semibold text-gray-700">
+      <h3 className="mt-8 mb-4 flex items-center gap-2 text-3xl font-semibold text-gray-700">
         <span className="h-8 w-2 rounded-full bg-gradient-to-b from-purple-500 to-pink-500" />
         {children}
       </h3>
     ),
     h4: ({ children }) => (
-      <h4 className="mb-3 mt-6 text-2xl font-semibold text-gray-700">{children}</h4>
+      <h4 className="mt-6 mb-3 text-2xl font-semibold text-gray-700">{children}</h4>
     ),
 
     // Paragraphs and text
@@ -85,7 +85,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
 
     // Blockquotes
     blockquote: ({ children }) => (
-      <blockquote className="mb-6 rounded-r-lg border-l-4 border-purple-500 bg-purple-50 py-4 pl-6 italic text-gray-700">
+      <blockquote className="mb-6 rounded-r-lg border-l-4 border-purple-500 bg-purple-50 py-4 pl-6 text-gray-700 italic">
         {children}
       </blockquote>
     ),
@@ -118,7 +118,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     strong: ({ children }) => (
       <strong className="rounded bg-yellow-100 px-1 font-bold text-gray-900">{children}</strong>
     ),
-    em: ({ children }) => <em className="font-medium italic text-purple-700">{children}</em>,
+    em: ({ children }) => <em className="font-medium text-purple-700 italic">{children}</em>,
 
     ...components,
   }

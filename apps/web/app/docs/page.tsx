@@ -9,6 +9,14 @@ import {
   ParamsDemo,
   TogglesDemo,
 } from '@/app/docs/examples'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
 import { siteName } from '@/lib/site'
 
 export const metadata: Metadata = {
@@ -29,7 +37,7 @@ function H2({ id, children }: { id: string; children: React.ReactNode }) {
   return (
     <h2
       id={id}
-      className="mb-6 mt-14 border-b-4 border-blue-500 pb-3 text-3xl font-bold text-gray-800"
+      className="mt-14 mb-6 border-b-4 border-blue-500 pb-3 text-3xl font-bold text-gray-800"
     >
       {children}
     </h2>
@@ -38,7 +46,7 @@ function H2({ id, children }: { id: string; children: React.ReactNode }) {
 
 function H3({ children }: { children: React.ReactNode }) {
   return (
-    <h3 className="mb-4 mt-10 flex items-center gap-2 text-2xl font-semibold text-gray-700">
+    <h3 className="mt-10 mb-4 flex items-center gap-2 text-2xl font-semibold text-gray-700">
       <span className="h-7 w-1.5 rounded-full bg-gradient-to-b from-purple-500 to-pink-500" />
       {children}
     </h3>
@@ -48,32 +56,42 @@ function H3({ children }: { children: React.ReactNode }) {
 function PropTable({ rows }: { rows: Array<[string, string, string, string]> }) {
   return (
     <div className="mb-6 overflow-x-auto">
-      <table className="min-w-full border-collapse overflow-hidden rounded-lg border border-gray-300 text-left text-sm shadow-lg">
-        <thead className="bg-gradient-to-r from-blue-500 to-purple-600 text-white">
-          <tr>
-            <th className="border border-gray-300 px-4 py-3 font-bold">Prop</th>
-            <th className="border border-gray-300 px-4 py-3 font-bold">Type</th>
-            <th className="border border-gray-300 px-4 py-3 font-bold">Default</th>
-            <th className="border border-gray-300 px-4 py-3 font-bold">Description</th>
-          </tr>
-        </thead>
-        <tbody>
+      <Table className="min-w-full overflow-hidden rounded-lg border border-gray-300 shadow-lg">
+        <TableHeader>
+          <TableRow className="bg-gradient-to-r from-blue-500 to-purple-600 hover:bg-transparent">
+            <TableHead className="border border-gray-300 px-4 py-3 font-bold text-white">
+              Prop
+            </TableHead>
+            <TableHead className="border border-gray-300 px-4 py-3 font-bold text-white">
+              Type
+            </TableHead>
+            <TableHead className="border border-gray-300 px-4 py-3 font-bold text-white">
+              Default
+            </TableHead>
+            <TableHead className="border border-gray-300 px-4 py-3 font-bold text-white">
+              Description
+            </TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
           {rows.map(([prop, type, def, description]) => (
-            <tr key={prop} className="transition-colors hover:bg-gray-50">
-              <td className="border border-gray-300 px-4 py-3 font-mono text-xs font-semibold text-pink-600">
+            <TableRow key={prop} className="hover:bg-muted/50 transition-colors">
+              <TableCell className="border border-gray-300 px-4 py-3 font-mono text-xs font-semibold whitespace-normal text-pink-600">
                 {prop}
-              </td>
-              <td className="border border-gray-300 px-4 py-3 font-mono text-xs text-gray-600">
+              </TableCell>
+              <TableCell className="text-muted-foreground border border-gray-300 px-4 py-3 font-mono text-xs whitespace-normal">
                 {type}
-              </td>
-              <td className="border border-gray-300 px-4 py-3 font-mono text-xs text-gray-600">
+              </TableCell>
+              <TableCell className="text-muted-foreground border border-gray-300 px-4 py-3 font-mono text-xs whitespace-normal">
                 {def}
-              </td>
-              <td className="border border-gray-300 px-4 py-3 text-gray-700">{description}</td>
-            </tr>
+              </TableCell>
+              <TableCell className="text-foreground border border-gray-300 px-4 py-3 whitespace-normal">
+                {description}
+              </TableCell>
+            </TableRow>
           ))}
-        </tbody>
-      </table>
+        </TableBody>
+      </Table>
     </div>
   )
 }
