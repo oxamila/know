@@ -49,6 +49,58 @@ export function FillDemo() {
   )
 }
 
+export function ParamsDemo() {
+  return (
+    <MathGraph
+      title="y = a · sin(b · x) — drag the sliders"
+      functions={[{ func: (x, p) => p.a * Math.sin(p.b * x), label: 'a · sin(b · x)' }]}
+      params={[
+        { name: 'a', label: 'amplitude a', min: 0.5, max: 3, step: 0.1, default: 1 },
+        { name: 'b', label: 'frequency b', min: 0.5, max: 4, step: 0.1, default: 1 },
+      ]}
+      xMin={-Math.PI * 2}
+      xMax={Math.PI * 2}
+      width={560}
+      height={360}
+    />
+  )
+}
+
+export function TogglesDemo() {
+  return (
+    <Chart
+      title="Untick legend items to hide series"
+      toggles
+      datasets={[
+        {
+          data: [
+            { x: 1, y: 12 },
+            { x: 2, y: 19 },
+            { x: 3, y: 14 },
+            { x: 4, y: 22 },
+          ],
+          type: 'bar',
+          color: '#3b82f6',
+          label: 'Revenue',
+        },
+        {
+          data: [
+            { x: 1, y: 15 },
+            { x: 2, y: 16 },
+            { x: 3, y: 17 },
+            { x: 4, y: 18 },
+          ],
+          type: 'line',
+          color: '#ec4899',
+          label: 'Trend',
+        },
+      ]}
+      width={480}
+      height={320}
+    />
+  )
+}
+
 export function MathGraph3DDemo() {
   return (
     <MathGraph3D

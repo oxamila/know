@@ -26,9 +26,9 @@ Site: ${siteUrl}
 - Categories are directories under content/; no registration needed.
 - MDX bodies: start at \`##\` (the page renders \`title\` as the single h1); import components from \`@repo/math-viz\`; math via \`$…$\` (inline) and \`$$…$$\` (display), compiled to KaTeX at build time.
 - Graph components (client-side, pan/zoom/rotate; accept real JS functions in MDX):
-  - \`MathGraph\` — 2D plots; \`func\` or \`functions[]\` with { func, color?, label?, fill?, fillOpacity? } (fill shades the area between a curve and the x-axis); props: xMin/xMax, width, height, color, title, showGrid, points, showLegend.
+  - \`MathGraph\` — 2D plots; \`func\` or \`functions[]\` with { func, color?, label?, fill?, fillOpacity? } (fill shades the area between a curve and the x-axis); \`params[]\` sliders make every function receive \`(x, p)\` with live param values; legend entries are checkboxes to hide/show curves; props: xMin/xMax, width, height, color, title, showGrid, points, showLegend.
   - \`MathGraph3D\` — 3D surfaces; \`func\` or \`surfaces[]\`; props: xMin/xMax/yMin/yMax, width, height, color, title, showGrid, gridSize, showAxes, showLegend.
-  - \`Chart\` — line/bar/area charts from data points; single-series (data + type) or multi-series combo via \`datasets[]\` with { data, type ('line'|'bar'|'area'), color?, label? }; props: width, height, color, title.
+  - \`Chart\` — line/bar/area charts from data points; single-series (data + type) or multi-series combo via \`datasets[]\` with { data, type ('line'|'bar'|'area'), color?, label? }; \`toggles\` renders legend checkboxes to hide/show series; props: width, height, color, title.
 
 ## Sitemap
 

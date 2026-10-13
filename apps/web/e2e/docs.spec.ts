@@ -33,7 +33,9 @@ test.describe('docs page', () => {
 
     // Fill demo legend + combo chart legend (series labels).
     await expect(page.getByRole('heading', { name: 'sin(x) with shaded area' })).toBeVisible()
-    await expect(page.getByRole('heading', { name: 'Bars + line + area on one chart' })).toBeVisible()
+    await expect(
+      page.getByRole('heading', { name: 'Bars + line + area on one chart' }),
+    ).toBeVisible()
     await expect(page.getByText('Revenue').first()).toBeVisible()
     await expect(page.getByText('Costs').first()).toBeVisible()
   })
@@ -45,6 +47,33 @@ test.describe('docs page', () => {
     await expect(page.getByText('functions', { exact: true }).first()).toBeVisible()
     await expect(page.getByText('surfaces', { exact: true }).first()).toBeVisible()
     await expect(page.getByText('gridSize', { exact: true })).toBeVisible()
+    await expect(page.getByText('params', { exact: true }).first()).toBeVisible()
+    await expect(page.getByText('toggles', { exact: true }).first()).toBeVisible()
+  })
+
+  test('slider and checkbox controls hydrate and respond', async ({ page }) => {
+    await page.goto('/docs')
+
+    // Parameter sliders from the ParamsDemo section.
+    await expect(page.getByRole('heading', { name: 'Parameter sliders' })).toBeVisible()
+    const slider = page.getByRole('slider', { name: 'amplitude a' })
+    await expect(slider).toBeVisible()
+    await expect(slider).toHaveValue('1')
+    await slider.fill('2')
+    await expect(page.getByText('2.00')).toBeVisible()
+
+    // Legend checkboxes (MathGraph multi-function demos + Chart toggles demo).
+    const chartToggle = page.getByRole('checkbox', { name: 'Show Revenue' })
+    await expect(chartToggle).toBeVisible()
+    await chartToggle.click()
+    await expect(chartToggle).not.toBeChecked()
+    await chartToggle.click()
+    await expect(chartToggle).toBeChecked()
+
+    const graphToggle = page.getByRole('checkbox', { name: 'Show cos(x)' }).first()
+    await expect(graphToggle).toBeChecked()
+    await graphToggle.click()
+    await expect(graphToggle).not.toBeChecked()
   })
 
   test('is reachable from the site nav and listed in the sitemap', async ({ page, request }) => {

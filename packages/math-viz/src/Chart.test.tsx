@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react'
+import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 import Chart from './Chart'
 
@@ -87,5 +87,64 @@ describe('Chart', () => {
     await waitFor(() => expect(container.querySelector('svg')).not.toBeNull())
     expect(container.querySelectorAll('path[stroke]').length).toBeGreaterThan(0)
     expect(container.querySelectorAll('rect').length).toBe(0)
+  })
+
+  it('renders a plain legend by default (no checkboxes without toggles)', async () => {
+    render(
+      <Chart
+        datasets={[
+          { data: [{ x: 1, y: 1 }], type: 'line', label: 'Trend' },
+          { data: [{ x: 1, y: 2 }], type: 'line', label: 'Forecast' },
+        ]}
+      />,
+    )
+    await waitFor(() => expect(screen.getByText('Trend')).toBeInTheDocument())
+    expect(screen.queryByRole('checkbox')).toBeNull()
+  })
+
+  it('hides and shows series via legend checkboxes when toggles is on', async () => {
+    const { container } = render(
+      <Chart
+        toggles
+        datasets={[
+          {
+            data: [
+              { x: 1, y: 3 },
+              { x: 2, y: 5 },
+            ],
+            type: 'bar',
+            color: '#3b82f6',
+            label: 'Revenue',
+          },
+          {
+            data: [
+              { x: 1, y: 4 },
+              { x: 2, y: 3 },
+            ],
+            type: 'line',
+            color: '#ec4899',
+            label: 'Trend',
+          },
+        ]}
+      />,
+    )
+    await waitFor(() => expect(container.querySelector('svg')).not.toBeNull())
+    expect(container.querySelectorAll('rect').length).toBe(2)
+    expect(container.querySelectorAll('path[stroke="#ec4899"]').length).toBe(1)
+
+    // Hide the bar series → rects gone, line remains.
+    fireEvent.click(screen.getByRole('checkbox', { name: 'Show Revenue' }))
+    expect(container.querySelectorAll('rect').length).toBe(0)
+    expect(container.querySelectorAll('path[stroke="#ec4899"]').length).toBe(1)
+
+    // Hide the line series too → no stroked paths left.
+    fireEvent.click(screen.getByRole('checkbox', { name: 'Show Trend' }))
+    expect(container.querySelectorAll('path[stroke="#ec4899"]').length).toBe(0)
+
+    // Restore both.
+    fireEvent.click(screen.getByRole('checkbox', { name: 'Show Revenue' }))
+    fireEvent.click(screen.getByRole('checkbox', { name: 'Show Trend' }))
+    expect(container.querySelectorAll('rect').length).toBe(2)
+    expect(container.querySelectorAll('path[stroke="#ec4899"]').length).toBe(1)
   })
 })

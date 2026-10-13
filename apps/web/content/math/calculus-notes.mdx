@@ -15,7 +15,9 @@ questions:
 2. **How much accumulates in total?** → *integral calculus* (integrals)
 
 The stunning surprise — the **Fundamental Theorem of Calculus** — is that these two questions are
-inverse operations of each other. Every graph on this page is live: drag to pan, scroll to zoom.
+inverse operations of each other. Every graph on this page is live: drag to pan, scroll to zoom,
+untick legend checkboxes to isolate curves, and drag the parameter sliders where provided to
+change a function while you watch.
 
 ## Limits — the foundation of everything
 
@@ -48,22 +50,22 @@ This "approach without arriving" idea is what makes derivatives possible.
 ### The tangent-line problem
 
 What is the slope of $y = x^2$ exactly at the point $(1, 1)$? A slope needs two points, but a
-tangent touches only one. Calculus' trick: **take secant lines with a second point closer and
-closer, and watch the slopes converge**.
+tangent touches only one. Calculus' trick: **take a secant line with a second point closer and
+closer, and watch the slope converge**. The secant from $(1, 1)$ to $(1+h, f(1+h))$ has slope
+$\frac{f(1+h) - f(1)}{h} = \frac{(1+h)^2 - 1}{h} = 2 + h$ — so it approaches the tangent's slope,
+$2$, exactly as $h \to 0$.
 
-Below, $f(x) = x^2$ is drawn with secant lines from $(1, 1)$ to $(1+h, f(1+h))$ for $h = 1$,
-$0.5$, $0.1$ — and the limiting tangent. Compare how each secant's slope ($3$, then $2.5$, then
-$2.1$) creeps toward the tangent's slope, $2$:
+Drag the slider below and watch the green secant (slope $2 + h$) collapse onto the red tangent
+(slope $2$) as $h$ shrinks:
 
 <MathGraph
-  title="Secant lines converging to the tangent at x = 1"
+  title="Drag h → 0: the secant collapses onto the tangent at x = 1"
   functions={[
     { func: (x) => x * x, color: '#3b82f6', label: 'f(x) = x²' },
-    { func: (x) => 3 * (x - 1) + 1, color: '#f59e0b', label: 'secant h = 1 (slope 3)' },
-    { func: (x) => 2.5 * (x - 1) + 1, color: '#ec4899', label: 'secant h = 0.5 (slope 2.5)' },
-    { func: (x) => 2.1 * (x - 1) + 1, color: '#10b981', label: 'secant h = 0.1 (slope 2.1)' },
+    { func: (x, p) => (2 + p.h) * (x - 1) + 1, color: '#10b981', label: 'secant (slope 2 + h)' },
     { func: (x) => 2 * (x - 1) + 1, color: '#ef4444', label: 'tangent (slope 2)' },
   ]}
+  params={[{ name: 'h', label: 'step h', min: 0.05, max: 2, step: 0.05, default: 1 }]}
   xMin={-1}
   xMax={3}
   width={660}
@@ -90,7 +92,8 @@ $$
 
 Once we have $f'(x)$ for every $x$, we can graph $f$ and $f'$ **on the same axes** and read the
 relationship directly: wherever $f'$ is *above* zero, $f$ is *rising*; wherever $f'$ dips below
-zero, $f$ is *falling*; and $f$ flattens out exactly where $f'$ crosses the axis.
+zero, $f$ is *falling*; and $f$ flattens out exactly where $f'$ crosses the axis. Untick a legend
+checkbox to hide one curve and study the other alone:
 
 <MathGraph
   title="f(x) = x³ − 3x and its derivative f'(x) = 3x² − 3"
@@ -216,13 +219,14 @@ $$
 \text{Area} \approx \sum_{i=0}^{n-1} f(x_i)\,\Delta x, \qquad \Delta x = \frac{b-a}{n}
 $$
 
-Below: $f(x) = x^2$ on $[0, 2]$ — bars are the 8-rectangle left sum (total $\approx 2.75$), the
+Below: $f(x) = x^2$ on $[0, 2]$ — bars are the 8-rectangle left sum (total $\approx 2.19$), the
 pink area is the true integral $\int_0^2 x^2\,dx = \tfrac{8}{3} \approx 2.667$. Notice every bar's
-top-left corner touches the curve, so the bars *overshoot* on the rising half — exactly the
-error a finer partition fixes:
+top-left corner touches the curve, so on this rising function the left-endpoint bars *undershoot*
+— exactly the error a finer partition fixes (untick a legend entry to isolate either series):
 
 <Chart
   title="Riemann rectangles vs the true area under x²"
+  toggles
   datasets={[
     {
       data: [
@@ -237,7 +241,7 @@ error a finer partition fixes:
       ],
       type: 'bar',
       color: '#3b82f6',
-      label: 'Left Riemann sum (n = 8, ≈ 2.75)',
+      label: 'Left Riemann sum (n = 8, ≈ 2.19)',
     },
     {
       data: [
@@ -260,6 +264,35 @@ error a finer partition fixes:
   height={380}
 />
 
+The same idea, live: the staircase below is the left-endpoint height function itself — flat at
+$(i\,\Delta x)^2$ across each subinterval, filled down to the axis so each step *is* a rectangle.
+Drag $n$ upward and watch the staircase (and the total area it encloses) chase the curve:
+
+<MathGraph
+  title="Drag n: the rectangle staircase hugs x² ever tighter"
+  functions={[
+    {
+      func: (x, p) => {
+        const n = Math.round(p.n)
+        const dx = 2 / n
+        const i = Math.min(Math.floor(x / dx), n - 1)
+        return (i * dx) * (i * dx)
+      },
+      color: '#3b82f6',
+      label: 'left-sum staircase (area ≈ 2.19 at n = 8)',
+      fill: true,
+      fillOpacity: 0.3,
+    },
+    { func: (x) => x * x, color: '#ec4899', label: 'f(x) = x²' },
+  ]}
+  params={[{ name: 'n', label: 'rectangles n', min: 2, max: 64, step: 1, default: 8 }]}
+  xMin={0}
+  xMax={2}
+  points={600}
+  width={660}
+  height={400}
+/>
+
 Letting $n \to \infty$ (rectangles become infinitely thin) turns the approximation into the
 **definite integral** — that limiting process *defines* $\int_a^b f(x)\,dx$.
 
@@ -279,7 +312,8 @@ $$
 $$
 
 All the curves $x^2 + C$ are **parallel** — identical shapes slid vertically — and *every one of
-them* has slope $2x$ at each $x$. Compare the family against the shared derivative:
+them* has slope $2x$ at each $x$. Compare the family against the shared derivative (untick the
+legend entries one by one to confirm each member really is a vertical shift of the others):
 
 <MathGraph
   title="The family x² + C — every member differentiates to 2x"
@@ -377,7 +411,8 @@ Both match the shaded areas in the graphs above — the theorem earned its name.
 ### Putting all three curves together
 
 One function, three calculus companions: $f$, its derivative $f'$, and its area function $F$
-(with $F(x) = \int_0^x f$). For $f(x) = \cos x$ we have $F(x) = \sin x$:
+(with $F(x) = \int_0^x f$). For $f(x) = \cos x$ we have $F(x) = \sin x$. Untick the legend
+entries to view each companion in isolation:
 
 <MathGraph
   title="cos(x), its derivative −sin(x), and its integral sin(x) — three views of one function"
