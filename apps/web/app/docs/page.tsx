@@ -1,5 +1,12 @@
 import type { Metadata } from 'next'
-import { ChartDemo, MathGraph3DDemo, MathGraphDemo, MultiFunctionDemo } from '@/app/docs/examples'
+import {
+  ChartDemo,
+  ComboChartDemo,
+  FillDemo,
+  MathGraph3DDemo,
+  MathGraphDemo,
+  MultiFunctionDemo,
+} from '@/app/docs/examples'
 import { siteName } from '@/lib/site'
 
 export const metadata: Metadata = {
@@ -230,6 +237,32 @@ Prose, then $f(x) = \\sin(x)$ inline math and a live graph:
   xMax={Math.PI}
 />`}</Code>
 
+          <H3>Shaded areas under curves</H3>
+          <p className="mb-4 text-lg leading-relaxed text-gray-700">
+            Set{' '}
+            <code className="rounded bg-gray-100 px-1 font-mono text-sm text-pink-600">
+              fill: true
+            </code>{' '}
+            on any function entry to shade the area between that curve and the x-axis. Control the
+            transparency with{' '}
+            <code className="rounded bg-gray-100 px-1 font-mono text-sm text-pink-600">
+              fillOpacity
+            </code>{' '}
+            (default 0.2). Works alongside unfilled curves for comparison.
+          </p>
+
+          <FillDemo />
+
+          <Code>{`<MathGraph
+  title="sin(x) with shaded area"
+  functions={[
+    { func: (x) => Math.sin(x), label: 'sin(x)', fill: true, fillOpacity: 0.25 },
+    { func: (x) => Math.cos(x), label: 'cos(x)' }, // no fill
+  ]}
+  xMin={-Math.PI}
+  xMax={Math.PI}
+/>`}</Code>
+
           <H3>Props</H3>
           <PropTable
             rows={[
@@ -243,7 +276,7 @@ Prose, then $f(x) = \\sin(x)$ inline math and a live graph:
                 'functions',
                 'FunctionDef[]',
                 '—',
-                'Multiple functions: `{ func, color?, label? }[]` — plot on one shared graph for comparison',
+                'Multiple functions: `{ func, color?, label?, fill?, fillOpacity? }[]` — plot on one shared graph for comparison',
               ],
               ['xMin', 'number', '-5', 'Left edge of the visible x range'],
               ['xMax', 'number', '5', 'Right edge of the visible x range'],
@@ -268,6 +301,18 @@ Prose, then $f(x) = \\sin(x)$ inline math and a live graph:
                 'boolean',
                 'true',
                 'Show the legend; it only appears when plotting more than one function',
+              ],
+              [
+                'fill',
+                'boolean (per function)',
+                'false',
+                'Shade the area between this curve and the x-axis (set on a FunctionDef entry)',
+              ],
+              [
+                'fillOpacity',
+                'number (per function)',
+                '0.2',
+                'Transparency of the shaded area when fill is true (0–1)',
               ],
             ]}
           />
@@ -364,30 +409,48 @@ Prose, then $f(x) = \\sin(x)$ inline math and a live graph:
 
         {/* ---------------------------------------------------------------- */}
         <section>
-          <H2 id="chart">Chart — simple line and bar charts</H2>
+          <H2 id="chart">Chart — line, bar, and area charts</H2>
           <p className="mb-4 text-lg leading-relaxed text-gray-700">
-            A lightweight static chart for explicit data points (no function evaluation, no
-            pan/zoom). Use{' '}
+            A lightweight chart for explicit data points (no function evaluation, no pan/zoom). Use{' '}
             <code className="rounded bg-gray-100 px-1 font-mono text-sm text-pink-600">
               MathGraph
             </code>{' '}
             for mathematical functions; use{' '}
             <code className="rounded bg-gray-100 px-1 font-mono text-sm text-pink-600">Chart</code>{' '}
-            for tabular data.
+            for tabular data. The simple form takes one{' '}
+            <code className="rounded bg-gray-100 px-1 font-mono text-sm text-pink-600">data</code>{' '}
+            series.
           </p>
 
           <ChartDemo />
 
-          <Code>{`import { Chart } from '@repo/math-viz'
+          <H3>Mixing bars, lines, and areas on one chart</H3>
+          <p className="mb-4 text-lg leading-relaxed text-gray-700">
+            Pass{' '}
+            <code className="rounded bg-gray-100 px-1 font-mono text-sm text-pink-600">
+              datasets
+            </code>{' '}
+            (an array) instead of{' '}
+            <code className="rounded bg-gray-100 px-1 font-mono text-sm text-pink-600">data</code>{' '}
+            to combine any mix of{' '}
+            <code className="rounded bg-gray-100 px-1 font-mono text-sm text-pink-600">bar</code>,{' '}
+            <code className="rounded bg-gray-100 px-1 font-mono text-sm text-pink-600">line</code>,
+            and{' '}
+            <code className="rounded bg-gray-100 px-1 font-mono text-sm text-pink-600">area</code>{' '}
+            series on shared axes.{' '}
+            <code className="rounded bg-gray-100 px-1 font-mono text-sm text-pink-600">area</code>{' '}
+            draws a line with the region beneath it shaded down to the baseline; multiple bar series
+            are placed side by side. A legend appears when datasets have labels.
+          </p>
 
-<Chart
-  title="Quarterly results"
-  type="bar"
-  data={[
-    { x: 1, y: 12 },
-    { x: 2, y: 19 },
-    { x: 3, y: 14 },
-    { x: 4, y: 22 },
+          <ComboChartDemo />
+
+          <Code>{`<Chart
+  title="Bars + line + area on one chart"
+  datasets={[
+    { data: revenue, type: 'bar',  color: '#3b82f6', label: 'Revenue' },
+    { data: trend,   type: 'line', color: '#ec4899', label: 'Trend' },
+    { data: costs,   type: 'area', color: '#10b981', label: 'Costs' },
   ]}
 />`}</Code>
 
@@ -398,17 +461,23 @@ Prose, then $f(x) = \\sin(x)$ inline math and a live graph:
                 'data',
                 '{ x: number, y: number }[]',
                 'sample curve',
-                'The points to plot; both axes auto-scale to the data',
+                'Single-series form; both axes auto-scale to the data',
+              ],
+              [
+                'datasets',
+                'DatasetDef[]',
+                '—',
+                'Multi-series form: `{ data, type?, color?, label? }[]`; overrides data/type when present',
               ],
               [
                 'type',
                 "'line' | 'bar'",
                 "'line'",
-                'Series style: connected line with dots, or bars',
+                'Single-series style; the per-dataset `type` additionally supports area',
               ],
               ['width', 'number', '400', 'SVG width in pixels'],
               ['height', 'number', '300', 'SVG height in pixels'],
-              ['color', 'string', "'#3b82f6'", 'Series color'],
+              ['color', 'string', "'#3b82f6'", 'Series color (single-series form)'],
               ['title', 'string', '—', 'Optional caption rendered above the chart'],
             ]}
           />

@@ -31,6 +31,28 @@ describe('MathGraph', () => {
     expect(screen.getByText('cos(x)')).toBeInTheDocument()
   })
 
+  it('renders a translucent area fill under functions marked fill: true', async () => {
+    const { container } = render(
+      <MathGraph functions={[{ func: (x) => x, fill: true, fillOpacity: 0.3, color: '#10b981' }]} />,
+    )
+    await waitFor(() => expect(container.querySelector('svg')).not.toBeNull())
+
+    const fill = container.querySelector('path[fill="#10b981"]')
+    expect(fill).not.toBeNull()
+    expect(fill?.getAttribute('fill-opacity')).toBe('0.3')
+    expect(fill?.getAttribute('d')).toContain('Z') // closed path
+    // The stroke line (fill="none") still renders alongside the fill.
+    expect(container.querySelector('path[fill="none"]')).not.toBeNull()
+  })
+
+  it('does not render area fills for functions without fill: true', async () => {
+    const { container } = render(<MathGraph func={(x) => x * x} />)
+    await waitFor(() => expect(container.querySelector('svg')).not.toBeNull())
+    // Only the curve line exists — no closed fill path.
+    const paths = [...container.querySelectorAll('path')]
+    expect(paths.every((p) => p.getAttribute('fill') === 'none')).toBe(true)
+  })
+
   it('zooms on wheel (range changes) and Reset View restores the initial range', async () => {
     const { container } = render(<MathGraph func={(x) => x} xMin={-2} xMax={2} />)
     await waitFor(() => expect(container.querySelector('svg')).not.toBeNull())

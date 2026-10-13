@@ -12,7 +12,7 @@ test.describe('docs page', () => {
       page.getByRole('heading', { name: /MathGraph3D — interactive 3D surfaces/ }),
     ).toBeVisible()
     await expect(
-      page.getByRole('heading', { name: /Chart — simple line and bar charts/ }),
+      page.getByRole('heading', { name: /Chart — line, bar, and area charts/ }),
     ).toBeVisible()
     await expect(page.getByRole('heading', { name: 'MDX elements' })).toBeVisible()
     await expect(page.getByRole('heading', { name: 'Math syntax (KaTeX)' })).toBeVisible()
@@ -26,6 +26,16 @@ test.describe('docs page', () => {
     const resetButtons = page.getByRole('button', { name: /Reset View/ })
     await expect(resetButtons.first()).toBeVisible()
     expect(await resetButtons.count()).toBeGreaterThanOrEqual(2)
+  })
+
+  test('fill and combo-chart demos render their labels', async ({ page }) => {
+    await page.goto('/docs')
+
+    // Fill demo legend + combo chart legend (series labels).
+    await expect(page.getByRole('heading', { name: 'sin(x) with shaded area' })).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Bars + line + area on one chart' })).toBeVisible()
+    await expect(page.getByText('Revenue').first()).toBeVisible()
+    await expect(page.getByText('Costs').first()).toBeVisible()
   })
 
   test('prop tables document the key props', async ({ page }) => {

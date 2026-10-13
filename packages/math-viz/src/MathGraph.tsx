@@ -6,6 +6,10 @@ interface FunctionDef {
   func: (x: number) => number
   color?: string
   label?: string
+  /** Shade the area between this curve and the x-axis (y = 0). */
+  fill?: boolean
+  /** Fill opacity when `fill` is true. Default 0.2. */
+  fillOpacity?: number
 }
 
 interface MathGraphProps {
@@ -94,6 +98,18 @@ export default function MathGraph({
       })
       .join(' '),
   )
+
+  // Closed paths shading the area between each filled curve and the x-axis
+  const fillPaths = functionsWithColors.map((f, i) => {
+    if (!f.fill || allData[i].length === 0) return null
+    const data = allData[i]
+    // Baseline at y = 0, clamped to the chart area when 0 is off-screen.
+    const baselineY = Math.min(Math.max(scaleY(0), padding), height - padding)
+    const line = data
+      .map((point, j) => `${j === 0 ? 'M' : 'L'} ${scaleX(point.x)} ${scaleY(point.y)}`)
+      .join(' ')
+    return `${line} L ${scaleX(data[data.length - 1].x)} ${baselineY} L ${scaleX(data[0].x)} ${baselineY} Z`
+  })
 
   // Calculate axis positions
   const xAxisY = scaleY(0)
@@ -250,6 +266,19 @@ export default function MathGraph({
               <line x1={yAxisX} y1={padding} x2={yAxisX} y2={height - padding} />
             )}
           </g>
+
+          {/* Shaded areas (under filled curves, behind their lines) */}
+          {fillPaths.map((fillPath, i) =>
+            fillPath ? (
+              <path
+                key={`fill-${i}`}
+                d={fillPath}
+                fill={functionsWithColors[i].color}
+                fillOpacity={functionsWithColors[i].fillOpacity ?? 0.2}
+                stroke="none"
+              />
+            ) : null,
+          )}
 
           {/* Function curves */}
           {linePaths.map((linePath, i) => (
