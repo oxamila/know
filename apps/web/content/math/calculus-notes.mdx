@@ -1,0 +1,522 @@
+---
+title: "Calculus: Limits, Derivatives, Integrals & Anti-Derivatives"
+description: A complete interactive tour of calculus — limits, differentiation, integration, anti-differentiation and the Fundamental Theorem, with live comparative graphs
+date: 2025-03-01
+author: Math Educator
+tags: [calculus, derivatives, integrals, limits, analysis]
+---
+
+import { MathGraph, Chart } from '@repo/math-viz'
+
+Calculus is the mathematics of **change** and **accumulation**. It answers two deceptively simple
+questions:
+
+1. **How fast is something changing right now?** → *differential calculus* (derivatives)
+2. **How much accumulates in total?** → *integral calculus* (integrals)
+
+The stunning surprise — the **Fundamental Theorem of Calculus** — is that these two questions are
+inverse operations of each other. Every graph on this page is live: drag to pan, scroll to zoom.
+
+## Limits — the foundation of everything
+
+Before we can speak of "instantaneous" change, we need the idea of a **limit**: what value a
+function *approaches* as $x$ approaches some point $c$, even if the function is undefined there.
+
+$$
+\lim_{x \to c} f(x) = L
+$$
+
+The classic example is $f(x) = \frac{\sin x}{x}$. At $x = 0$ the formula divides by zero — yet the
+function clearly approaches $1$. Zoom in near the origin (scroll on the graph) and watch the hole
+at $x = 0$ get arbitrarily close to height $1$:
+
+<MathGraph
+  title="f(x) = sin(x)/x approaches 1 at x = 0"
+  func={(x) => (x === 0 ? NaN : Math.sin(x) / x)}
+  xMin={-6}
+  xMax={6}
+  color="#8b5cf6"
+  width={640}
+  height={380}
+/>
+
+The point at $x=0$ is simply missing (the function is undefined there) — the limit still exists.
+This "approach without arriving" idea is what makes derivatives possible.
+
+## Derivatives (differentiation)
+
+### The tangent-line problem
+
+What is the slope of $y = x^2$ exactly at the point $(1, 1)$? A slope needs two points, but a
+tangent touches only one. Calculus' trick: **take secant lines with a second point closer and
+closer, and watch the slopes converge**.
+
+Below, $f(x) = x^2$ is drawn with secant lines from $(1, 1)$ to $(1+h, f(1+h))$ for $h = 1$,
+$0.5$, $0.1$ — and the limiting tangent. Compare how each secant's slope ($3$, then $2.5$, then
+$2.1$) creeps toward the tangent's slope, $2$:
+
+<MathGraph
+  title="Secant lines converging to the tangent at x = 1"
+  functions={[
+    { func: (x) => x * x, color: '#3b82f6', label: 'f(x) = x²' },
+    { func: (x) => 3 * (x - 1) + 1, color: '#f59e0b', label: 'secant h = 1 (slope 3)' },
+    { func: (x) => 2.5 * (x - 1) + 1, color: '#ec4899', label: 'secant h = 0.5 (slope 2.5)' },
+    { func: (x) => 2.1 * (x - 1) + 1, color: '#10b981', label: 'secant h = 0.1 (slope 2.1)' },
+    { func: (x) => 2 * (x - 1) + 1, color: '#ef4444', label: 'tangent (slope 2)' },
+  ]}
+  xMin={-1}
+  xMax={3}
+  width={660}
+  height={420}
+/>
+
+### The formal definition
+
+The derivative is exactly that limiting slope, for *every* point $x$:
+
+$$
+f'(x) = \lim_{h \to 0} \frac{f(x+h) - f(x)}{h}
+$$
+
+The expression $\frac{f(x+h) - f(x)}{h}$ is the **difference quotient** — the slope of a secant
+over a step of size $h$. Sending $h \to 0$ squashes the secant onto the tangent. For $f(x) = x^2$
+this computation is worth doing once by hand:
+
+$$
+f'(x) = \lim_{h \to 0} \frac{(x+h)^2 - x^2}{h} = \lim_{h \to 0} \frac{2xh + h^2}{h} = \lim_{h \to 0} (2x + h) = 2x
+$$
+
+### The derivative as a function
+
+Once we have $f'(x)$ for every $x$, we can graph $f$ and $f'$ **on the same axes** and read the
+relationship directly: wherever $f'$ is *above* zero, $f$ is *rising*; wherever $f'$ dips below
+zero, $f$ is *falling*; and $f$ flattens out exactly where $f'$ crosses the axis.
+
+<MathGraph
+  title="f(x) = x³ − 3x and its derivative f'(x) = 3x² − 3"
+  functions={[
+    { func: (x) => x * x * x - 3 * x, color: '#3b82f6', label: 'f(x) = x³ − 3x' },
+    { func: (x) => 3 * x * x - 3, color: '#ec4899', label: "f'(x) = 3x² − 3" },
+  ]}
+  xMin={-2.5}
+  xMax={2.5}
+  width={660}
+  height={420}
+/>
+
+Follow the blue curve from left to right and check it against the pink derivative:
+
+- On $(-\infty, -1)$: $f'$ is positive → $f$ rises.
+- At $x = -1$: $f' = 0$ → $f$ peaks (a local maximum).
+- On $(-1, 1)$: $f'$ is negative → $f$ falls.
+- At $x = 1$: $f' = 0$ → $f$ bottoms out (a local minimum).
+- On $(1, \infty)$: $f'$ is positive → $f$ rises again.
+
+This is **curve sketching from derivatives** — the mechanical heart of differential calculus.
+
+### Differentiation rules
+
+Computing derivatives from the limit definition every time would be unbearable. The rules below
+turn it into algebra. (Try verifying each one against a graph of $f$ and $f'$.)
+
+| Rule | Statement | Example |
+| ---- | --------- | ------- |
+| Constant | $\frac{d}{dx} c = 0$ | $\frac{d}{dx} 7 = 0$ |
+| Power rule | $\frac{d}{dx} x^n = n x^{n-1}$ | $\frac{d}{dx} x^5 = 5x^4$ |
+| Constant multiple | $\frac{d}{dx} [c \cdot f(x)] = c \cdot f'(x)$ | $\frac{d}{dx} 3x^2 = 6x$ |
+| Sum rule | $\frac{d}{dx} [f + g] = f' + g'$ | $\frac{d}{dx}(x^2 + \sin x) = 2x + \cos x$ |
+| Product rule | $\frac{d}{dx}[f \cdot g] = f'g + fg'$ | $\frac{d}{dx}(x e^x) = e^x + x e^x$ |
+| Chain rule | $\frac{d}{dx} f(g(x)) = f'(g(x)) \cdot g'(x)$ | $\frac{d}{dx} \sin(x^2) = 2x\cos(x^2)$ |
+
+The **chain rule** is the one that repays deep study: it is how calculus handles nested change —
+the rate of the outer thing, times the rate of the inner thing.
+
+### A bestiary of derivatives
+
+Compare a function with its derivative, live. Each graph overlays $f$ and $f'$ — pause and
+confirm the rising/falling correspondence before reading the captions:
+
+<MathGraph
+  title="sin(x) and cos(x) — derivative of sine is cosine"
+  functions={[
+    { func: (x) => Math.sin(x), color: '#3b82f6', label: 'sin(x)' },
+    { func: (x) => Math.cos(x), color: '#ec4899', label: 'cos(x) = derivative' },
+  ]}
+  xMin={-Math.PI * 2}
+  xMax={Math.PI * 2}
+  width={660}
+  height={400}
+/>
+
+Where $\sin$ peaks ($x = \pi/2$), $\cos$ crosses zero. Where $\sin$ is steepest (crossing the
+axis at $x = 0, \pm\pi, \dots$), $|\cos|$ is at its maximum of $1$. The two curves are a quarter
+wavelength apart — that phase shift *is* the derivative relationship.
+
+<MathGraph
+  title="eˣ is its own derivative — the exponential's unique superpower"
+  functions={[
+    { func: (x) => Math.exp(x), color: '#10b981', label: 'eˣ' },
+    { func: (x) => Math.exp(x), color: '#ef4444', label: "d/dx eˣ (identical!)" },
+  ]}
+  xMin={-2}
+  xMax={3}
+  width={640}
+  height={380}
+/>
+
+$e^x$ is the (essentially unique) function whose rate of change equals its own value — which is
+why it models unchecked growth, compound interest, and population explosions.
+
+<MathGraph
+  title="ln(x) and 1/x — derivative of the logarithm"
+  functions={[
+    { func: (x) => (x > 0 ? Math.log(x) : NaN), color: '#8b5cf6', label: 'ln(x)' },
+    { func: (x) => (x > 0 ? 1 / x : NaN), color: '#f59e0b', label: '1/x = derivative' },
+  ]}
+  xMin={-1}
+  xMax={8}
+  width={640}
+  height={380}
+/>
+
+Natural log grows forever, but its slope $1/x$ decays toward zero — the original "slow growth"
+function. (Negative $x$ is skipped: $\ln$ is undefined there.)
+
+## Integration (integral calculus)
+
+### The area problem
+
+Flip the tangent-line question around. Instead of *given a curve, find the slope*, ask: *given a
+rate, find the total*. Concretely: **what is the area between $y = \sin x$ and the $x$-axis from
+$0$ to $\pi$?** The shaded region below *is* the definite integral
+
+$$
+\int_0^{\pi} \sin x \, dx
+$$
+
+<MathGraph
+  title="∫₀^π sin x dx — the shaded area equals 2"
+  functions={[{ func: (x) => Math.sin(x), color: '#3b82f6', label: 'sin(x)', fill: true, fillOpacity: 0.3 }]}
+  xMin={-0.5}
+  xMax={Math.PI + 0.5}
+  width={660}
+  height={400}
+/>
+
+The arch of sine from $0$ to $\pi$ encloses exactly **2** square units. (Scroll to inspect the
+edges; the fill hugs the curve down to the axis.)
+
+### Riemann sums — approximating area with rectangles
+
+How would you *compute* that area from scratch? Cut the interval into thin slices, build
+rectangles, add their areas, and take more, thinner slices. With a **left Riemann sum** of $n$
+rectangles on $[a, b]$:
+
+$$
+\text{Area} \approx \sum_{i=0}^{n-1} f(x_i)\,\Delta x, \qquad \Delta x = \frac{b-a}{n}
+$$
+
+Below: $f(x) = x^2$ on $[0, 2]$ — bars are the 8-rectangle left sum (total $\approx 2.75$), the
+pink area is the true integral $\int_0^2 x^2\,dx = \tfrac{8}{3} \approx 2.667$. Notice every bar's
+top-left corner touches the curve, so the bars *overshoot* on the rising half — exactly the
+error a finer partition fixes:
+
+<Chart
+  title="Riemann rectangles vs the true area under x²"
+  datasets={[
+    {
+      data: [
+        { x: 0, y: 0 },
+        { x: 0.25, y: 0.0625 },
+        { x: 0.5, y: 0.25 },
+        { x: 0.75, y: 0.5625 },
+        { x: 1, y: 1 },
+        { x: 1.25, y: 1.5625 },
+        { x: 1.5, y: 2.25 },
+        { x: 1.75, y: 3.0625 },
+      ],
+      type: 'bar',
+      color: '#3b82f6',
+      label: 'Left Riemann sum (n = 8, ≈ 2.75)',
+    },
+    {
+      data: [
+        { x: 0, y: 0 },
+        { x: 0.25, y: 0.0625 },
+        { x: 0.5, y: 0.25 },
+        { x: 0.75, y: 0.5625 },
+        { x: 1, y: 1 },
+        { x: 1.25, y: 1.5625 },
+        { x: 1.5, y: 2.25 },
+        { x: 1.75, y: 3.0625 },
+        { x: 2, y: 4 },
+      ],
+      type: 'area',
+      color: '#ec4899',
+      label: 'True area (8/3 ≈ 2.667)',
+    },
+  ]}
+  width={620}
+  height={380}
+/>
+
+Letting $n \to \infty$ (rectangles become infinitely thin) turns the approximation into the
+**definite integral** — that limiting process *defines* $\int_a^b f(x)\,dx$.
+
+### Indefinite integrals — anti-differentiation
+
+An **antiderivative** of $f$ is any function $F$ with $F' = f$. The **indefinite integral**
+
+$$
+\int f(x)\, dx = F(x) + C
+$$
+
+names the whole *family* of antiderivatives — one for each choice of the constant $C$, because
+differentiating kills constants. For $f(x) = 2x$:
+
+$$
+\int 2x\, dx = x^2 + C
+$$
+
+All the curves $x^2 + C$ are **parallel** — identical shapes slid vertically — and *every one of
+them* has slope $2x$ at each $x$. Compare the family against the shared derivative:
+
+<MathGraph
+  title="The family x² + C — every member differentiates to 2x"
+  functions={[
+    { func: (x) => 2 * x, color: '#ef4444', label: 'shared derivative 2x' },
+    { func: (x) => x * x - 2, color: '#3b82f6', label: 'x² − 2 (C = −2)' },
+    { func: (x) => x * x, color: '#10b981', label: 'x² (C = 0)' },
+    { func: (x) => x * x + 2, color: '#8b5cf6', label: 'x² + 2 (C = +2)' },
+  ]}
+  xMin={-3}
+  xMax={3}
+  width={660}
+  height={420}
+/>
+
+At any fixed $x$, all three blue/purple/green curves have the *same* slope — the red value
+$2x$. That uniformity across the family is exactly what "the antiderivative is only defined up
+to a constant" means geometrically.
+
+Common antiderivatives (each verifiable by differentiating the right-hand side):
+
+| $f(x)$ | $\int f(x)\,dx$ |
+| ------ | --------------- |
+| $x^n$ $(n \neq -1)$ | $\frac{x^{n+1}}{n+1} + C$ |
+| $\frac{1}{x}$ | $\ln\|x\| + C$ |
+| $e^x$ | $e^x + C$ |
+| $\sin x$ | $-\cos x + C$ |
+| $\cos x$ | $\sin x + C$ |
+| $c \cdot f(x)$ | $c \int f(x)\,dx$ |
+
+## The Fundamental Theorem of Calculus
+
+Here is the bridge between the two halves. Differentiation and integration are **inverse
+operations**.
+
+### Part 1 — the area function is an antiderivative
+
+Define the **accumulation function**
+
+$$
+A(x) = \int_a^x f(t)\, dt
+$$
+
+(the shaded area from a fixed $a$ up to a moving endpoint $x$). Then:
+
+$$
+A'(x) = f(x)
+$$
+
+**Rates and totals undo each other.** The rate at which area accumulates *is* the height of the
+curve. Watch it concretely with $f(t) = \sin t$ on $[0, x]$: its area function is
+$A(x) = \int_0^x \sin t\, dt = 1 - \cos x$ — and differentiating $1 - \cos x$ returns $\sin x$,
+as promised:
+
+<MathGraph
+  title="FTC Part 1: A(x) = 1 − cos(x) rises exactly where sin(x) is positive"
+  functions={[
+    { func: (x) => Math.sin(x), color: '#3b82f6', label: 'f(x) = sin(x)', fill: true, fillOpacity: 0.2 },
+    { func: (x) => 1 - Math.cos(x), color: '#ec4899', label: 'A(x) = 1 − cos(x)' },
+  ]}
+  xMin={-0.5}
+  xMax={Math.PI * 2 + 0.5}
+  width={660}
+  height={420}
+/>
+
+Read the graph: while the blue curve is positive ($0$ to $\pi$), the pink area function *climbs*.
+While blue is negative ($\pi$ to $2\pi$), pink *descends* — subtracting area. Pink flattens
+precisely where blue crosses zero. **The graph of $A$ is the running total of $f$; the graph of
+$f$ is the slope of $A$.**
+
+### Part 2 — computing areas with antiderivatives
+
+Part 2 is the computational payoff. If $F' = f$, then
+
+$$
+\int_a^b f(x)\, dx = F(b) - F(a)
+$$
+
+No rectangles, no limits — just evaluate an antiderivative at the two endpoints. For our sine
+arch:
+
+$$
+\int_0^{\pi} \sin x\, dx = [-\cos x]_0^{\pi} = (-\cos \pi) - (-\cos 0) = 1 + 1 = 2
+$$
+
+And for the parabola:
+
+$$
+\int_0^2 x^2\, dx = \left[\frac{x^3}{3}\right]_0^2 = \frac{8}{3} - 0 = \frac{8}{3}
+$$
+
+Both match the shaded areas in the graphs above — the theorem earned its name.
+
+### Putting all three curves together
+
+One function, three calculus companions: $f$, its derivative $f'$, and its area function $F$
+(with $F(x) = \int_0^x f$). For $f(x) = \cos x$ we have $F(x) = \sin x$:
+
+<MathGraph
+  title="cos(x), its derivative −sin(x), and its integral sin(x) — three views of one function"
+  functions={[
+    { func: (x) => Math.cos(x), color: '#3b82f6', label: 'f(x) = cos(x)' },
+    { func: (x) => -Math.sin(x), color: '#ec4899', label: "f'(x) = −sin(x) (slope of f)" },
+    { func: (x) => Math.sin(x), color: '#10b981', label: 'F(x) = sin(x) (area under f)' },
+  ]}
+  xMin={-Math.PI}
+  xMax={Math.PI * 2}
+  width={680}
+  height={440}
+/>
+
+The three curves interlock like gears: each pink/green extremum sits above a blue zero, and the
+green area-function rises exactly while blue is above the axis. **Differentiation rotates the
+phase by a quarter wavelength; integration rotates it back the other way.**
+
+## Worked examples
+
+### Example 1 — differentiate a polynomial
+
+**Problem.** Find $f'(x)$ for $f(x) = 3x^4 - 2x + 5$, and locate its critical points.
+
+**Solution.** Apply the power and sum rules term by term:
+
+$$
+f'(x) = 12x^3 - 2
+$$
+
+Critical points where $f' = 0$: $12x^3 = 2$, so $x = \sqrt[3]{1/6} \approx 0.55$. Verify on the
+graph — the pink derivative crosses zero there, and the blue curve momentarily flattens:
+
+<MathGraph
+  title="Example 1: f(x) = 3x⁴ − 2x + 5 with f'(x) = 12x³ − 2"
+  functions={[
+    { func: (x) => 3 * x ** 4 - 2 * x + 5, color: '#3b82f6', label: 'f(x)' },
+    { func: (x) => 12 * x ** 3 - 2, color: '#ec4899', label: "f'(x)" },
+  ]}
+  xMin={-1.5}
+  xMax={1.5}
+  width={640}
+  height={400}
+/>
+
+### Example 2 — the chain rule in the wild
+
+**Problem.** Differentiate $g(x) = \sin(x^2)$.
+
+**Solution.** Outer function $\sin(\cdot)$, inner function $u = x^2$. By the chain rule:
+
+$$
+g'(x) = \cos(x^2) \cdot 2x = 2x\cos(x^2)
+$$
+
+The factor $2x$ means the oscillation's *amplitude envelope* grows linearly — compare $g$ with
+its derivative below; the derivative's swings widen as $|x|$ increases:
+
+<MathGraph
+  title="Example 2: sin(x²) and its derivative 2x·cos(x²)"
+  functions={[
+    { func: (x) => Math.sin(x * x), color: '#3b82f6', label: 'sin(x²)' },
+    { func: (x) => 2 * x * Math.cos(x * x), color: '#ec4899', label: '2x·cos(x²)' },
+  ]}
+  xMin={-4}
+  xMax={4}
+  width={660}
+  height={420}
+/>
+
+### Example 3 — a definite integral by hand
+
+**Problem.** Compute $\int_1^3 (2x + 1)\, dx$ geometrically and with the FTC.
+
+**Solution.** The region is a trapezoid under the line $y = 2x+1$ from $1$ to $3$ — heights $3$
+and $7$, width $2$ — area $\tfrac{3+7}{2} \cdot 2 = 10$. With the FTC, antiderivative $x^2 + x$:
+
+$$
+\int_1^3 (2x+1)\,dx = [x^2 + x]_1^3 = (9+3) - (1+1) = 10
+$$
+
+<MathGraph
+  title="Example 3: area under y = 2x + 1 from 1 to 3 equals 10"
+  functions={[{ func: (x) => 2 * x + 1, color: '#10b981', label: '2x + 1', fill: true, fillOpacity: 0.3 }]}
+  xMin={0}
+  xMax={4}
+  width={620}
+  height={380}
+/>
+
+### Example 4 — optimization with derivatives
+
+**Problem.** A farmer has 40 m of fence for three sides of a rectangular pen (a river forms the
+fourth side). Maximize the enclosed area.
+
+**Solution.** Let $x$ be each side perpendicular to the river; the parallel side is
+$40 - 2x$. Area:
+
+$$
+A(x) = x(40 - 2x) = 40x - 2x^2, \qquad A'(x) = 40 - 4x
+$$
+
+Setting $A' = 0$ gives $x = 10$ — the unique critical point, and since $A'' = -4 < 0$ it is a
+maximum. The optimal pen is $10 \times 20$ m for $200\ \mathrm{m}^2$. The parabola below peaks
+exactly where its derivative crosses zero:
+
+<MathGraph
+  title="Example 4: area A(x) = 40x − 2x² peaks at x = 10"
+  functions={[
+    { func: (x) => 40 * x - 2 * x * x, color: '#3b82f6', label: 'A(x) = 40x − 2x²' },
+    { func: (x) => 40 - 4 * x, color: '#ef4444', label: "A'(x) = 40 − 4x" },
+  ]}
+  xMin={0}
+  xMax={20}
+  width={660}
+  height={420}
+/>
+
+## The big picture
+
+| Question | Tool | Symbol | Answer type |
+| -------- | ---- | ------ | ----------- |
+| Slope / instantaneous rate | Derivative | $f'(x) = \dfrac{d}{dx}f(x)$ | A function |
+| Antiderivative / reverse slope | Indefinite integral | $\displaystyle\int f(x)\,dx$ | A family $F(x) + C$ |
+| Accumulated total / area | Definite integral | $\displaystyle\int_a^b f(x)\,dx$ | A number |
+| Link between all three | FTC | $A'(x) = f(x)$, $\int_a^b f = F(b)-F(a)$ | — |
+
+The one-sentence version: **differentiation measures change, integration adds up change, and the
+Fundamental Theorem says they are inverses.** Everything else — related rates, differential
+equations, series, multivariable calculus — is elaboration on that single idea.
+
+## Where to go next
+
+- **Differential equations** — find the function $y(x)$ given a rule about its own derivative,
+  like $\dfrac{dy}{dx} = ky$ (solutions: exponentials).
+- **Taylor series** — rebuild complicated functions from polynomials, term by term, using higher
+  and higher derivatives.
+- **Multivariable calculus** — the same two ideas in dimensions beyond one: partial derivatives
+  and double/triple integrals (see the surfaces in the 3D post on this site).
+
+Every graph here rewards hands-on exploration — pan along a derivative, zoom into a Riemann
+sum, and let the pictures do half the proving.
