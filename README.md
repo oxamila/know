@@ -82,6 +82,10 @@ Frontmatter is validated against a Zod schema; invalid metadata fails the build.
 
 ## Documentation
 
+The site serves its own reference at **`/docs`** (component props for `MathGraph`/`MathGraph3D`/`Chart` with live demos, the MDX element map, math syntax, frontmatter) plus a machine-readable index at **`/llms.txt`** for LLM tools.
+
+Repository guides:
+
 | Guide                                          | Contents                                       |
 | ---------------------------------------------- | ---------------------------------------------- |
 | [`docs/architecture.md`](docs/architecture.md) | Monorepo structure, data flow, rendering model |
