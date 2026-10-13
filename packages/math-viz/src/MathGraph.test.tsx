@@ -55,18 +55,39 @@ describe('MathGraph', () => {
     expect(paths.every((p) => p.getAttribute('fill') === 'none')).toBe(true)
   })
 
-  it('zooms on wheel (range changes) and Reset View restores the initial range', async () => {
+  it('zooms on Ctrl+wheel (range changes) and Reset View restores the initial range', async () => {
     const { container } = render(<MathGraph func={(x) => x} xMin={-2} xMax={2} />)
     await waitFor(() => expect(container.querySelector('svg')).not.toBeNull())
 
     expect(screen.getByText(/Range: \[-2\.00, 2\.00\]/)).toBeInTheDocument()
 
     const svg = container.querySelector('svg') as Element
-    fireEvent.wheel(svg, { deltaY: -120 })
+    fireEvent.wheel(svg, { deltaY: -120, ctrlKey: true })
     expect(screen.queryByText(/Range: \[-2\.00, 2\.00\]/)).toBeNull()
 
     fireEvent.click(screen.getByRole('button', { name: /Reset View/ }))
     expect(screen.getByText(/Range: \[-2\.00, 2\.00\]/)).toBeInTheDocument()
+  })
+
+  it('lets plain scroll pass through to the page (no zoom without Ctrl/⌘)', async () => {
+    const { container } = render(<MathGraph func={(x) => x} xMin={-2} xMax={2} />)
+    await waitFor(() => expect(container.querySelector('svg')).not.toBeNull())
+
+    const svg = container.querySelector('svg') as Element
+    fireEvent.wheel(svg, { deltaY: -120 })
+    expect(screen.getByText(/Range: \[-2\.00, 2\.00\]/)).toBeInTheDocument()
+  })
+
+  it('zooms with the +/− buttons', async () => {
+    const { container } = render(<MathGraph func={(x) => x} xMin={-2} xMax={2} />)
+    await waitFor(() => expect(container.querySelector('svg')).not.toBeNull())
+
+    fireEvent.click(screen.getByRole('button', { name: 'Zoom in' }))
+    expect(screen.queryByText(/Range: \[-2\.00, 2\.00\]/)).toBeNull()
+
+    fireEvent.click(screen.getByRole('button', { name: /Reset View/ }))
+    fireEvent.click(screen.getByRole('button', { name: 'Zoom out' }))
+    expect(screen.queryByText(/Range: \[-2\.00, 2\.00\]/)).toBeNull()
   })
 
   it('supports dragging (pan) without crashing', async () => {
@@ -116,6 +137,34 @@ describe('MathGraph', () => {
     await waitFor(() => expect(screen.getByRole('slider', { name: 'a' })).toBeInTheDocument())
     fireEvent.change(screen.getByRole('slider', { name: 'a' }), { target: { value: '3' } })
     expect(screen.getByText('3.00')).toBeInTheDocument()
+  })
+
+  it('accepts `value` as an alias for `default` in param defs', async () => {
+    const { container } = render(
+      <MathGraph
+        func={(x, p) => Math.sin(p.a * x)}
+        params={[{ name: 'a', label: 'freq a', min: 0.5, max: 4, step: 0.5, value: 2 }]}
+      />,
+    )
+    await waitFor(() => expect(container.querySelector('svg')).not.toBeNull())
+
+    const slider = screen.getByRole('slider', { name: 'freq a' })
+    expect(slider).toHaveValue('2')
+    expect(screen.getByText('2.00')).toBeInTheDocument()
+  })
+
+  it('falls back to min when a param def has neither default nor value (no crash)', async () => {
+    const { container } = render(
+      <MathGraph
+        func={(x, p) => x * (p.k ?? 1)}
+        params={[{ name: 'k', min: 1, max: 5, step: 1 }]}
+      />,
+    )
+    await waitFor(() => expect(container.querySelector('svg')).not.toBeNull())
+
+    const slider = screen.getByRole('slider', { name: 'k' })
+    expect(slider).toHaveValue('1')
+    expect(screen.getByText('1.00')).toBeInTheDocument()
   })
 
   it('hides and shows curves via legend checkboxes', async () => {

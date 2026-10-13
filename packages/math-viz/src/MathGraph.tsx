@@ -21,7 +21,19 @@ interface ParamDef {
   max: number
   /** Slider granularity; default 0.1. */
   step?: number
-  default: number
+  /** Initial slider value. */
+  default?: number
+  /** Alias for `default`. */
+  value?: number
+}
+
+/** Initial value for a param: default ?? value ?? min ?? 0, always finite and clamped. */
+function resolveParamValue(p: ParamDef): number {
+  const candidate = p.default ?? p.value ?? p.min ?? 0
+  const n = typeof candidate === 'number' && Number.isFinite(candidate) ? candidate : 0
+  if (typeof p.min === 'number' && n < p.min) return p.min
+  if (typeof p.max === 'number' && n > p.max) return p.max
+  return n
 }
 
 interface MathGraphProps {
@@ -65,7 +77,7 @@ export default function MathGraph({
 
   // Slider values (one entry per `params` definition)
   const [paramValues, setParamValues] = useState<Record<string, number>>(() =>
-    Object.fromEntries((params ?? []).map((p) => [p.name, p.default])),
+    Object.fromEntries((params ?? []).map((p) => [p.name, resolveParamValue(p)])),
   )
 
   // Curves hidden via legend checkboxes (indices into functionsWithColors)
@@ -192,15 +204,21 @@ export default function MathGraph({
     setIsDragging(false)
   }
 
-  // Zoom with mouse wheel
-  const handleWheel = (e: React.WheelEvent) => {
-    e.preventDefault()
-    const zoomFactor = e.deltaY > 0 ? 1.1 : 0.9
+  // Zoom with mouse wheel — only with Ctrl/⌘ held (trackpad pinch reports as
+  // ctrlKey). Plain scroll passes through so the page keeps scrolling when the
+  // cursor happens to sit over a graph.
+  const zoomBy = (factor: number) => {
     const center = (xMin + xMax) / 2
-    const range = ((xMax - xMin) * zoomFactor) / 2
+    const range = ((xMax - xMin) * factor) / 2
 
     setXMin(center - range)
     setXMax(center + range)
+  }
+
+  const handleWheel = (e: React.WheelEvent) => {
+    if (!e.ctrlKey && !e.metaKey) return
+    e.preventDefault()
+    zoomBy(e.deltaY > 0 ? 1.1 : 0.9)
   }
 
   // Reset view
@@ -254,7 +272,7 @@ export default function MathGraph({
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
           onWheel={handleWheel}
-          style={{ touchAction: 'none' }}
+          style={{ touchAction: 'pan-y' }}
         >
           {/* Grid lines */}
           {showGrid && (
@@ -391,28 +409,31 @@ export default function MathGraph({
         {/* Parameter sliders */}
         {params && params.length > 0 && (
           <div className="flex w-full max-w-lg flex-col gap-2 rounded-lg bg-white/80 px-4 py-3 shadow-md backdrop-blur-sm">
-            {params.map((p) => (
-              <label key={p.name} className="flex items-center gap-3 text-sm">
-                <span className="w-28 shrink-0 font-mono font-semibold text-gray-700">
-                  {p.label ?? p.name}
-                </span>
-                <input
-                  type="range"
-                  min={p.min}
-                  max={p.max}
-                  step={p.step ?? 0.1}
-                  value={paramValues[p.name] ?? p.default}
-                  onChange={(e) =>
-                    setParamValues((prev) => ({ ...prev, [p.name]: Number(e.target.value) }))
-                  }
-                  className="flex-1 accent-blue-600"
-                  aria-label={p.label ?? p.name}
-                />
-                <span className="w-14 shrink-0 text-right font-mono text-xs text-gray-600">
-                  {(paramValues[p.name] ?? p.default).toFixed(2)}
-                </span>
-              </label>
-            ))}
+            {params.map((p) => {
+              const current = paramValues[p.name] ?? resolveParamValue(p)
+              return (
+                <label key={p.name} className="flex items-center gap-3 text-sm">
+                  <span className="w-28 shrink-0 font-mono font-semibold text-gray-700">
+                    {p.label ?? p.name}
+                  </span>
+                  <input
+                    type="range"
+                    min={p.min}
+                    max={p.max}
+                    step={p.step ?? 0.1}
+                    value={current}
+                    onChange={(e) =>
+                      setParamValues((prev) => ({ ...prev, [p.name]: Number(e.target.value) }))
+                    }
+                    className="flex-1 accent-blue-600"
+                    aria-label={p.label ?? p.name}
+                  />
+                  <span className="w-14 shrink-0 text-right font-mono text-xs text-gray-600">
+                    {current.toFixed(2)}
+                  </span>
+                </label>
+              )
+            })}
           </div>
         )}
 
@@ -442,6 +463,20 @@ export default function MathGraph({
         {/* Controls */}
         <div className="flex items-center gap-2">
           <button
+            onClick={() => zoomBy(1.25)}
+            aria-label="Zoom out"
+            className="rounded-lg bg-gray-200 px-3 py-2 font-semibold text-gray-700 shadow-md transition-all hover:scale-105 hover:bg-gray-300 active:scale-95"
+          >
+            −
+          </button>
+          <button
+            onClick={() => zoomBy(0.8)}
+            aria-label="Zoom in"
+            className="rounded-lg bg-gray-200 px-3 py-2 font-semibold text-gray-700 shadow-md transition-all hover:scale-105 hover:bg-gray-300 active:scale-95"
+          >
+            +
+          </button>
+          <button
             onClick={handleReset}
             className="rounded-lg bg-gradient-to-r from-blue-500 to-purple-500 px-4 py-2 font-semibold text-white shadow-md transition-all hover:scale-105 hover:shadow-lg active:scale-95"
           >
@@ -455,7 +490,8 @@ export default function MathGraph({
         {/* Instructions */}
         <div className="max-w-md text-center text-xs text-gray-500">
           <p>
-            💡 <strong>Tip:</strong> Drag to pan • Scroll to zoom
+            💡 <strong>Tip:</strong> Drag to pan • Ctrl/⌘ + scroll (or +/−) to zoom — plain scroll
+            moves the page
             {params && params.length > 0 ? ' • Use sliders to change parameters' : ''}
             {functionsWithColors.length > 1 ? ' • Untick legend items to hide curves' : ''} • Tap
             Reset to restore

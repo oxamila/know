@@ -203,9 +203,10 @@ Prose, then $f(x) = \\sin(x)$ inline math and a live graph:
             <code className="rounded bg-gray-100 px-1 font-mono text-sm text-pink-600">
               y = f(x)
             </code>{' '}
-            on a shared SVG. Drag to pan, scroll (or pinch) to zoom, and use Reset View to restore
-            the original range. Client component — import it in an MDX body and pass a real
-            JavaScript function.
+            on a shared SVG. Drag to pan; zoom with Ctrl/⌘+scroll (trackpad pinch works too) or the
+            +/− buttons — plain scroll moves the page, so a graph never traps your scrollwheel — and
+            use Reset View to restore the original range. Client component — import it in an MDX
+            body and pass a real JavaScript function.
           </p>
 
           <MathGraphDemo />
@@ -315,7 +316,7 @@ Prose, then $f(x) = \\sin(x)$ inline math and a live graph:
                 'params',
                 'ParamDef[]',
                 '—',
-                'Interactive sliders: `{ name, label?, min, max, step?, default }[]` — every function is called as (x, p) with p[name] = slider value',
+                'Interactive sliders: `{ name, label?, min, max, step?, default }[]` (`value` is an alias for `default`; falls back to `min`) — every function is called as (x, p) with p[name] = slider value',
               ],
               ['xMin', 'number', '-5', 'Left edge of the visible x range'],
               ['xMax', 'number', '5', 'Right edge of the visible x range'],
@@ -378,9 +379,9 @@ Prose, then $f(x) = \\sin(x)$ inline math and a live graph:
               z = f(x, y)
             </code>{' '}
             as shaded wireframes on a ground grid with colored XYZ axes. Controls: left-drag (or one
-            finger) to orbit with momentum, right-drag / Shift-drag (or two fingers) to pan, scroll
-            to zoom (0.3×–4×). Buttons: Home (reset view), Auto (rotate), Grid (toggle), and X / Y /
-            Z view presets.
+            finger) to orbit with momentum, right-drag / Shift-drag (or two fingers) to pan,
+            Ctrl/⌘+scroll or the +/− buttons to zoom (0.3×–4×) — plain scroll moves the page.
+            Buttons: Home (reset view), Auto (rotate), Grid (toggle), and X / Y / Z view presets.
           </p>
 
           <MathGraph3DDemo />

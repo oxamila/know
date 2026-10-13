@@ -59,7 +59,7 @@ import { MathGraph } from '@repo/math-viz'
 
 To compare several functions on one shared graph, pass `functions` (an array of `{ func, color?, label?, fill?, fillOpacity? }`) instead of `func`; colors and a legend are handled automatically. Set `fill: true` on an entry to shade the area between that curve and the x-axis (`fillOpacity` controls transparency, default 0.2). Legend entries are checkboxes, so readers can untick a curve to hide it and tick it back to restore it.
 
-To let readers explore a family of functions interactively, pass `params` (an array of `{ name, label?, min, max, step?, default }`). Every plotted function is then called as `(x, p)` where `p[name]` is the current slider value; labeled sliders render below the plot and the curve redraws live:
+To let readers explore a family of functions interactively, pass `params` (an array of `{ name, label?, min, max, step?, default }`). `default` (or its alias `value`) sets the initial slider position; if both are omitted the slider starts at `min`. Every plotted function is then called as `(x, p)` where `p[name]` is the current slider value; labeled sliders render below the plot and the curve redraws live:
 
 ```mdx
 <MathGraph
@@ -88,7 +88,7 @@ To let readers explore a family of functions interactively, pass `params` (an ar
 | `points`        | no       | `200`      | Samples per curve                                                                                  |
 | `showLegend`    | no       | `true`     | Legend (checkboxes to hide/show curves); only shown when plotting more than one curve              |
 
-The y-axis auto-fits the sampled values; there is no `yMin`/`yMax` prop, so narrow the x range around functions with vertical asymptotes. Drag to pan, scroll to zoom.
+The y-axis auto-fits the sampled values; there is no `yMin`/`yMax` prop, so narrow the x range around functions with vertical asymptotes. Drag to pan; zoom with Ctrl/⌘+scroll (trackpad pinch works too) or the +/− buttons — plain scroll moves the page and never gets trapped by a graph.
 
 ### `MathGraph3D` (3D)
 
@@ -110,7 +110,7 @@ import { MathGraph3D } from '@repo/math-viz'
 />
 ```
 
-`surfaces` is an array of `{ func, color, label? }`, where `func` is `(x, y) => number`. Plot several surfaces in one viewer by adding more entries; a legend appears automatically. Props: `xMin`/`xMax`/`yMin`/`yMax` (all default `-5`/`5`), `width` (600), `height` (500), `color`, `title`, `showGrid`, `gridSize` (20, mesh resolution), `showAxes`, `showLegend`. Controls let you orbit (with momentum), pan, and zoom, plus Home/Auto/Grid toggles and X/Y/Z axis-view buttons.
+`surfaces` is an array of `{ func, color, label? }`, where `func` is `(x, y) => number`. Plot several surfaces in one viewer by adding more entries; a legend appears automatically. Props: `xMin`/`xMax`/`yMin`/`yMax` (all default `-5`/`5`), `width` (600), `height` (500), `color`, `title`, `showGrid`, `gridSize` (20, mesh resolution), `showAxes`, `showLegend`. Controls let you orbit (with momentum), pan, and zoom (Ctrl/⌘+scroll or the +/− buttons; plain scroll moves the page), plus Home/Auto/Grid toggles and X/Y/Z axis-view buttons.
 
 ### `Chart` (line/bar/area)
 

@@ -1,39 +1,345 @@
 ---
-title: Introduction to Calculus
-description: Learn the fundamentals of calculus with interactive visualizations
-date: 2025-01-15
+title: Calculus from Zero – Limits, Derivatives and Integrals
+description: A beginner-friendly, interactive guide. Drag the sliders, watch the graphs move, and see how a function, its derivative and its integral relate.
+date: 2026-10-13
 author: Math Educator
-tags: [calculus, derivatives, mathematics]
+tags: [calculus, limits, derivatives, integrals, interactive]
 ---
 
-import { MathGraph } from '@repo/math-viz'
+import { MathGraph, Chart } from '@repo/math-viz'
 
-Welcome to the world of **calculus**! This is where mathematics meets motion and change.
+Calculus is the maths of **change** (derivatives) and **accumulation** (integrals). Everything below is interactive: **drag every slider** and **click the legend checkboxes** to hide or show curves.
 
-## What is a Derivative?
+- **Derivative** answers: *how fast is it changing right now?* (speed)
+- **Integral** answers: *how much has piled up in total?* (distance)
+- They are **opposites**, like multiplying and dividing.
 
-A derivative tells us the **rate of change** at any point. Think of it as the slope of a curve!
+## 1. Big picture: car dashboard
+
+| You see | Calculus name | Meaning |
+|---|---|---|
+| Distance travelled | Function $f(x)$ | Where you are |
+| Speedometer | Derivative $f'(x)$ | How fast it changes |
+| Trip odometer | Integral $\int f(x)\,dx$ | Total accumulated |
+
+Going **down** the table is *differentiating*. Going **up** is *integrating*.
+
+## 2. Limits: getting closer and closer
+
+A **limit** asks: what value does $f(x)$ approach as $x$ gets close to a number, even if we can't plug that number in?
+
+$$
+f(x)=\frac{x^2-1}{x-1}\quad\Rightarrow\quad \lim_{x\to 1} f(x)=2
+$$
+
+At $x=1$ we get $0/0$ (a hole), but for every other $x$ the function equals $x+1$, so it heads to $2$. Move the slider and watch the point slide toward the hole.
 
 <MathGraph
-  title="f(x) = x²"
-  func={(x) => x * x}
-  xMin={-5}
-  xMax={5}
-  color="#3b82f6"
+  title="Limit: approaching x = 1 (the hole)"
+  xMin={-2}
+  xMax={4}
   width={600}
-  height={400}
+  height={380}
+  params={[{ name: 'x0', label: 'x (try 1.0)', min: -1, max: 3, step: 0.05, value: 0.2 }]}
+  functions={[
+    { func: (x, p) => x + 1, color: '#3b82f6', label: 'f(x) = (x²−1)/(x−1) = x+1' },
+    { func: (x, p) => (Math.abs(x - p.x0) < 0.06 ? p.x0 + 1 : NaN), color: '#ef4444', label: 'your x → f(x)' }
+  ]}
 />
 
-The derivative of $x^2$ is $2x$, which means the slope increases linearly!
+## 3. Three functions, three stories
+
+Take the same starting function and see its **derivative** and **integral** side by side.
+
+| | Function $f$ | Derivative $f'$ | Integral $F$ |
+|---|---|---|---|
+| Constant | $c$ | $0$ | $cx$ |
+| Line | $x$ | $1$ | $\tfrac{x^2}{2}$ |
+| Parabola | $x^2$ | $2x$ | $\tfrac{x^3}{3}$ |
+| Cubic | $x^3$ | $3x^2$ | $\tfrac{x^4}{4}$ |
+| Sine | $\sin x$ | $\cos x$ | $-\cos x$ |
+| Exponential | $e^x$ | $e^x$ | $e^x$ |
+
+**What each operation does to the graph**
+
+- **Derivative** = the *slope* of $f$. Where $f$ rises, $f'$ is positive. Where $f$ has a peak or valley, $f'=0$.
+- **Integral** = the *area* under $f$. Where $f$ is positive, $F$ climbs. Where $f$ is zero, $F$ is flat.
+
+<MathGraph
+  title="f(x) = x² vs f'(x) = 2x vs F(x) = x³/3"
+  xMin={-4}
+  xMax={4}
+  width={600}
+  height={420}
+  functions={[
+    { func: (x) => x * x, color: '#3b82f6', label: 'f(x) = x²  (original)' },
+    { func: (x) => 2 * x, color: '#ef4444', label: "f'(x) = 2x  (derivative)" },
+    { func: (x) => (x * x * x) / 3, color: '#10b981', label: 'F(x) = x³/3  (integral)' }
+  ]}
+/>
+
+Hide two curves with the checkboxes and look at the third alone. Notice: at $x=0$ the blue curve is at its **lowest point**, and the red curve **crosses zero** exactly there.
+
+### Compare any wave: change amplitude and frequency
+
+<MathGraph
+  title="a·sin(b·x), its derivative and its integral"
+  xMin={-7}
+  xMax={7}
+  width={600}
+  height={420}
+  params={[
+    { name: 'a', label: 'amplitude a', min: 0.5, max: 3, step: 0.1, value: 1 },
+    { name: 'b', label: 'frequency b', min: 0.5, max: 3, step: 0.1, value: 1 }
+  ]}
+  functions={[
+    { func: (x, p) => p.a * Math.sin(p.b * x), color: '#3b82f6', label: 'f = a·sin(bx)' },
+    { func: (x, p) => p.a * p.b * Math.cos(p.b * x), color: '#ef4444', label: "f' = ab·cos(bx)" },
+    { func: (x, p) => (-p.a / p.b) * Math.cos(p.b * x), color: '#10b981', label: 'F = −(a/b)·cos(bx)' }
+  ]}
+/>
+
+Raise $b$: the **derivative gets taller** (fast wiggles mean fast change) while the **integral gets shorter** (fast wiggles cancel out). That is the whole story in one picture.
+
+## 4. Derivatives: the slope at one point
+
+### 4.1 From secant to tangent (the key idea)
+
+A **secant** line joins two points on a curve. Shrink the gap $h$ between the points and the secant turns into the **tangent**, and its slope is the derivative.
 
 $$
-\frac{d}{dx} x^2 = 2x
+f'(x)=\lim_{h\to 0}\frac{f(x+h)-f(x)}{h}
 $$
 
-## Key Concepts
+Set $h$ big, then slide it toward $0$.
 
-- **Instantaneous rate of change**: The slope at a single point
-- **Tangent line**: A line that touches the curve at exactly one point
-- **Limit**: The foundation of calculus
+<MathGraph
+  title="Secant becoming tangent for f(x) = x²  (point at x = a)"
+  xMin={-1}
+  xMax={5}
+  width={600}
+  height={420}
+  params={[
+    { name: 'a', label: 'point a', min: 0, max: 3, step: 0.1, value: 1.5 },
+    { name: 'h', label: 'gap h', min: 0.01, max: 2, step: 0.01, value: 1.5 }
+  ]}
+  functions={[
+    { func: (x) => x * x, color: '#3b82f6', label: 'f(x) = x²' },
+    { func: (x, p) => p.a * p.a + ((Math.pow(p.a + p.h, 2) - p.a * p.a) / p.h) * (x - p.a), color: '#f59e0b', label: 'secant (gap h)' },
+    { func: (x, p) => p.a * p.a + 2 * p.a * (x - p.a), color: '#ef4444', label: 'tangent (slope 2a)' }
+  ]}
+/>
 
-> "The derivative is the heart of calculus - it captures change in its purest form."
+Secant slope here is $2a+h$. As $h\to 0$ it becomes $2a$, matching the rule $\frac{d}{dx}x^2=2x$.
+
+### 4.2 The slope changes as you move: slider for x
+
+Move $a$ and read the tangent. Steep up means big positive $f'$, flat means $0$, down means negative.
+
+<MathGraph
+  title="Tangent line of f(x) = x³ − 3x at x = a"
+  xMin={-3}
+  xMax={3}
+  width={600}
+  height={420}
+  params={[{ name: 'a', label: 'x = a', min: -2.5, max: 2.5, step: 0.05, value: -1.5 }]}
+  functions={[
+    { func: (x) => x * x * x - 3 * x, color: '#3b82f6', label: 'f(x) = x³ − 3x' },
+    { func: (x, p) => p.a ** 3 - 3 * p.a + (3 * p.a * p.a - 3) * (x - p.a), color: '#ef4444', label: 'tangent at a' },
+    { func: (x) => 3 * x * x - 3, color: '#10b981', label: "f'(x) = 3x² − 3" }
+  ]}
+/>
+
+Try $a=-1$ and $a=1$: the tangent is **flat** (a peak and a valley) and the green curve touches **zero**. That is how derivatives find maximums and minimums.
+
+### 4.3 Rules (cheat sheet)
+
+| Rule | Formula |
+|---|---|
+| Power | $\frac{d}{dx}x^n = n x^{n-1}$ |
+| Constant multiple | $\frac{d}{dx}\big(c f\big) = c f'$ |
+| Sum | $(f+g)' = f' + g'$ |
+| Product | $(fg)' = f'g + fg'$ |
+| Chain | $\frac{d}{dx}f(g(x)) = f'(g(x))\,g'(x)$ |
+
+## 5. Integrals: area and accumulation
+
+### 5.1 Area as rectangles (Riemann sum)
+
+How do you measure the area under a curve? Slice it into $n$ thin rectangles, add them up, and let $n$ grow. More rectangles give a better answer.
+
+$$
+\int_a^b f(x)\,dx=\lim_{n\to\infty}\sum_{i=1}^{n} f(x_i)\,\Delta x
+$$
+
+<MathGraph
+  title="Riemann sum of f(x) = x² on [0, 3]  (exact area = 9)"
+  xMin={-0.5}
+  xMax={3.5}
+  width={600}
+  height={420}
+  params={[{ name: 'n', label: 'rectangles n', min: 1, max: 60, step: 1, value: 4 }]}
+  functions={[
+    { func: (x) => x * x, color: '#3b82f6', label: 'f(x) = x²' },
+    { func: (x, p) => { if (x < 0 || x > 3) return 0; const d = 3 / p.n; return Math.pow(Math.min(Math.floor(x / d), p.n - 1) * d, 2); }, color: '#8b5cf6', label: 'rectangles (left sums)', fill: true, fillOpacity: 0.3 }
+  ]}
+/>
+
+At $n=4$ you underestimate (left rectangles sit under a rising curve). At $n=60$ the gap almost disappears. The exact area is $\int_0^3 x^2\,dx=\frac{3^3}{3}=9$.
+
+### 5.2 Sweeping area: the integral as a growing function
+
+Let $F(t)=\int_0^t x^2\,dx$. Drag $t$: the shaded area grows, and the green curve $F(t)=t^3/3$ records the area so far.
+
+<MathGraph
+  title="Area swept from 0 to t"
+  xMin={-0.5}
+  xMax={4}
+  width={600}
+  height={420}
+  params={[{ name: 't', label: 'sweep to t', min: 0, max: 3.5, step: 0.05, value: 1.5 }]}
+  functions={[
+    { func: (x) => x * x, color: '#3b82f6', label: 'f(x) = x²' },
+    { func: (x, p) => (x >= 0 && x <= p.t ? x * x : 0), color: '#3b82f6', label: 'area up to t', fill: true, fillOpacity: 0.3 },
+    { func: (x) => (x >= 0 ? (x * x * x) / 3 : 0), color: '#10b981', label: 'F(x) = x³/3 (area so far)' }
+  ]}
+/>
+
+Read the picture: at any $t$, the **height of the green curve = the shaded area**. And the **slope of the green curve = height of the blue curve**. That link is the next section.
+
+### 5.3 Indefinite vs definite
+
+| | Indefinite | Definite |
+|---|---|---|
+| Notation | $\int f(x)\,dx$ | $\int_a^b f(x)\,dx$ |
+| Result | A **function** $F(x)+C$ | A **number** |
+| Meaning | Family of anti-derivatives | Signed area from $a$ to $b$ |
+
+The $+C$ appears because shifting a curve up or down does not change its slope.
+
+<MathGraph
+  title="Same derivative, different C:  F(x) = x²/2 + C"
+  xMin={-4}
+  xMax={4}
+  width={600}
+  height={380}
+  params={[{ name: 'C', label: 'constant C', min: -4, max: 4, step: 0.25, value: 0 }]}
+  functions={[
+    { func: (x, p) => (x * x) / 2 + p.C, color: '#10b981', label: 'F(x) = x²/2 + C' },
+    { func: (x) => x, color: '#ef4444', label: "its derivative is always x" }
+  ]}
+/>
+
+## 6. The Fundamental Theorem of Calculus
+
+This one idea ties everything together:
+
+$$
+\frac{d}{dx}\int_a^x f(t)\,dt = f(x)\qquad\text{and}\qquad \int_a^b f(x)\,dx = F(b)-F(a)
+$$
+
+- **Part 1**: differentiate an integral and you get the original function back.
+- **Part 2**: to find an area, find any anti-derivative $F$ and subtract the ends.
+
+Example: $\int_1^3 2x\,dx = [x^2]_1^3 = 9-1 = 8$.
+
+<MathGraph
+  title="∫ from a to b of 2x dx  = b² − a²"
+  xMin={-0.5}
+  xMax={5}
+  width={600}
+  height={400}
+  params={[
+    { name: 'a', label: 'start a', min: 0, max: 4, step: 0.1, value: 1 },
+    { name: 'b', label: 'end b', min: 0, max: 4, step: 0.1, value: 3 }
+  ]}
+  functions={[
+    { func: (x) => 2 * x, color: '#ef4444', label: 'f(x) = 2x' },
+    { func: (x, p) => (x >= p.a && x <= p.b ? 2 * x : 0), color: '#ef4444', label: 'area from a to b', fill: true, fillOpacity: 0.3 }
+  ]}
+/>
+
+Pick $a=1,\ b=3$: the shaded triangle-and-rectangle region is $3^2-1^2=8$. Change them and check $b^2-a^2$ yourself.
+
+## 7. Worked examples
+
+**Example 1: differentiate.** $f(x)=3x^4-5x^2+7$
+
+$$
+f'(x)=12x^3-10x
+$$
+
+**Example 2: chain rule.** $f(x)=\sin(x^2)$
+
+$$
+f'(x)=\cos(x^2)\cdot 2x
+$$
+
+**Example 3: integrate.** $\int (6x^2+4x-1)\,dx$
+
+$$
+=2x^3+2x^2-x+C
+$$
+
+**Example 4: definite integral.** $\int_0^{\pi}\sin x\,dx$
+
+$$
+=[-\cos x]_0^{\pi}=1-(-1)=2
+$$
+
+**Example 5: optimisation.** Fence a rectangle with $20\,\text{m}$ of wire. What width gives the largest area?
+
+With width $w$, length is $10-w$, so area $A(w)=w(10-w)=10w-w^2$. Set $A'(w)=10-2w=0$, so $w=5$ (a $5\times5$ square), giving $A=25$.
+
+<MathGraph
+  title="Area A(w) = 10w − w²  and its slope A'(w) = 10 − 2w"
+  xMin={0}
+  xMax={10}
+  width={600}
+  height={380}
+  params={[{ name: 'w', label: 'width w', min: 0, max: 10, step: 0.1, value: 2 }]}
+  functions={[
+    { func: (x) => 10 * x - x * x, color: '#3b82f6', label: 'A(w)' },
+    { func: (x) => 10 - 2 * x, color: '#ef4444', label: "A'(w)" },
+    { func: (x, p) => (Math.abs(x - p.w) < 0.08 ? 10 * p.w - p.w * p.w : NaN), color: '#f59e0b', label: 'your width' }
+  ]}
+/>
+
+The peak of the blue curve sits where the red curve crosses zero: $w=5$.
+
+**Example 6: real life.** A ball's height is $h(t)=20t-5t^2$ metres.
+
+- Velocity is $h'(t)=20-10t$. At $t=2$ it is $0$ m/s (the top of the throw).
+- Going backwards, integrating the velocity gives the height again.
+
+<Chart
+  title="Ball height h(t) and velocity v(t) over 4 seconds"
+  type="line"
+  width={600}
+  height={360}
+  toggles
+  datasets={[
+    { type: 'line', color: '#3b82f6', label: 'height h(t)', data: [{ x: 0, y: 0 }, { x: 0.5, y: 8.75 }, { x: 1, y: 15 }, { x: 1.5, y: 18.75 }, { x: 2, y: 20 }, { x: 2.5, y: 18.75 }, { x: 3, y: 15 }, { x: 3.5, y: 8.75 }, { x: 4, y: 0 }] },
+    { type: 'line', color: '#ef4444', label: 'velocity v(t)', data: [{ x: 0, y: 20 }, { x: 0.5, y: 15 }, { x: 1, y: 10 }, { x: 1.5, y: 5 }, { x: 2, y: 0 }, { x: 2.5, y: -5 }, { x: 3, y: -10 }, { x: 3.5, y: -15 }, { x: 4, y: -20 }] }
+  ]}
+/>
+
+## 8. Summary: derivative vs integral
+
+| | Derivative | Integral |
+|---|---|---|
+| Question | How fast is it changing? | How much has built up? |
+| Geometry | **Slope** of the tangent | **Area** under the curve |
+| Direction | Breaks a quantity into change | Adds changes into a total |
+| Power rule | $x^n \to n x^{n-1}$ | $x^n \to \frac{x^{n+1}}{n+1}$ |
+| At a peak or valley of $f$ | $f'=0$ | $F$ has a slope of $f$, so it is flat only where $f=0$ |
+| Real life | Speed from distance | Distance from speed |
+
+> Derivatives and integrals are two views of one story: **change** and **accumulation**.
+
+## 9. Where to go next
+
+- **Limits in depth**: epsilon-delta, continuity
+- **Techniques**: substitution, integration by parts, partial fractions
+- **Applications**: volumes, arc length, differential equations
+- **More dimensions**: partial derivatives and double integrals with `MathGraph3D`
